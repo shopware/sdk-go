@@ -5,7 +5,7 @@
 # Override behaviour via GO / TEST_FLAGS env vars, which the script reads.
 CI := .github/scripts/ci.sh
 
-.PHONY: build test vet ci-test
+.PHONY: build test vet ci-test secrets
 
 build:
 	@bash $(CI) build
@@ -20,3 +20,9 @@ ci-test:
 # Not part of CI; kept as a local convenience.
 vet:
 	@for m in . integrations/gin clients/adminapi; do echo ">> vet $$m"; (cd "$$m" && go vet ./...) || exit 1; done
+
+# Scan commits and uncommitted changes for secrets, with the same config as the
+# "Secret scan" CI job. Needs gitleaks (installed in the dev container).
+secrets:
+	@gitleaks git --config .gitleaks.toml --redact --no-banner
+	@gitleaks git --pre-commit --config .gitleaks.toml --redact --no-banner

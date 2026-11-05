@@ -9,6 +9,8 @@ ARG GOLANGCI_LINT_VERSION=v2.13.2  # keep in sync with .github/workflows/ci.yml
 ARG DELVE_VERSION=v1.27.2
 ARG GOVULNCHECK_VERSION=v1.8.0
 ARG GOTESTSUM_VERSION=v1.13.0
+# Keep GITLEAKS_VERSION in sync with .github/workflows/ci.yml.
+ARG GITLEAKS_VERSION=v8.30.1
 
 FROM mcr.microsoft.com/devcontainers/go:${GO_IMAGE_VERSION}
 
@@ -45,6 +47,8 @@ USER vscode
 ARG DELVE_VERSION
 ARG GOVULNCHECK_VERSION
 ARG GOTESTSUM_VERSION
+ARG GITLEAKS_VERSION
 RUN go install github.com/go-delve/delve/cmd/dlv@${DELVE_VERSION} \
  && go install golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION} \
- && go install gotest.tools/gotestsum@${GOTESTSUM_VERSION}
+ && go install gotest.tools/gotestsum@${GOTESTSUM_VERSION} \
+ && go install github.com/zricethezav/gitleaks/v8@${GITLEAKS_VERSION}

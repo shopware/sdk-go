@@ -1,0 +1,21 @@
+# gitleaks configuration: the default rules plus an allowlist of the fake secrets
+# used in tests, examples and docs. CI scans every new commit with it
+# (job "Secret scan" in .github/workflows/ci.yml); run `make secrets` locally.
+#
+# The allowlist matches secret *values*, not paths, so a real secret is still
+# reported in a test file or a README. Name fake secrets after these patterns
+# (see CONTRIBUTING.md).
+title = "sdk-go"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Fake secrets used in tests, examples and docs"
+regexTarget = "secret"
+regexes = [
+  '''^test-secret-[A-Za-z0-9-]*$''',
+  '''^valid-secret-[0-9]+$''',
+  '''^my-secret-min-[0-9]+-chars$''',
+  '''^your-app-secret-min-[0-9]+-chars$''',
+]

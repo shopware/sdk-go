@@ -31,6 +31,7 @@ go test ./examples/vanilla-service
 (cd examples/gin-service && go test ./...)
 (cd examples/admin-extension && go test ./...)
 golangci-lint run ./...
+make secrets
 ```
 
 For benchmark or performance-sensitive changes:
@@ -38,6 +39,17 @@ For benchmark or performance-sensitive changes:
 ```bash
 .github/scripts/run-benchmarks.sh
 ```
+
+## Secrets In Tests And Examples
+
+CI scans every new commit for secrets with [gitleaks](https://github.com/gitleaks/gitleaks)
+(job `Secret scan`); `make secrets` runs the same check locally. Fake secrets in tests,
+examples and docs must match one of the allowlisted patterns in
+[.gitleaks.toml](.gitleaks.toml), for example `test-secret-1234567890`. The allowlist
+matches values, not files, so a real secret is reported wherever it appears.
+
+If a real secret was committed, revoke it first: removing it from the branch does not
+help once it has been pushed to a public repository.
 
 ## Design Principles
 
