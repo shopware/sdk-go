@@ -50,7 +50,8 @@ jobs:
           git fetch --no-tags origin "${BASE}"
           failed=0
           for m in . integrations/gin clients/adminapi; do
-            before=$(git show "origin/${BASE}:${m}/go.mod" 2>/dev/null | awk '$1 == "go" {print $2; exit}')
+            # A module that does not exist on the base branch yet has no directive to keep.
+            before=$( (git show "origin/${BASE}:${m}/go.mod" 2>/dev/null || true) | awk '$1 == "go" {print $2; exit}')
             after=$(awk '$1 == "go" {print $2; exit}' "${m}/go.mod")
             if [[ -n "${before}" && "${before}" != "${after}" ]]; then
               echo "::error file=${m}/go.mod::go directive changed ${before} -> ${after}. Published modules keep their minimum Go version; pin or ignore the dependency that requires the newer Go (see .github/dependabot.yml), or apply the 'go-version-bump' label."
