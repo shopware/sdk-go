@@ -1,0 +1,5 @@
+# Code owners are automatically requested for review on every pull request,
+# including Dependabot dependency-update PRs.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @buzyka @j-rodriguezmartinez @nsaliu @Saad-Mahamood @SimonVorgers @quando1910

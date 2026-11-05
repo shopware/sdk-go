@@ -1,0 +1,283 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, feat/* ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+env:
+  # We support the last 2 Go minors (1.26, 1.27); pin the oldest one here.
+  # Always the latest secure patch of that minor.
+  GO_VERSION: '1.26.10'
+  # Keep golangci-lint / govulncheck in sync with .devcontainer/Dockerfile.
+  GOLANGCI_LINT_VERSION: 'v2.13.2'
+  GOVULNCHECK_VERSION: 'v1.8.0'
+
+# The repository is a multi-module Go workspace (see go.work). Each module is
+# linted, tested, scanned and built independently via the matrix below. The
+# committed go.work resolves cross-module dependencies (core <-> integrations)
+# to the local sources, so CI exercises the code as it lives in the repo.
+jobs:
+  # The `go` directive of a published module is the minimum Go version forced on
+  # every consumer, so it is raised only on purpose. Dependabot cannot be told to
+  # leave it alone: when a bumped dependency declares a newer `go`, it raises the
+  # directive itself. This job stops such PRs; bypass with the "go-version-bump"
+  # label for an intentional raise.
+  go-directive:
+    name: Go directive unchanged
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Compare go directives with the base branch
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: |
+          set -euo pipefail
+          if echo "${LABELS}" | grep -q '"go-version-bump"'; then
+            echo "go-version-bump label present — skipping."
+            exit 0
+          fi
+          git fetch --no-tags origin "${BASE}"
+          failed=0
+          for m in . integrations/gin clients/adminapi; do
+            before=$(git show "origin/${BASE}:${m}/go.mod" 2>/dev/null | awk '$1 == "go" {print $2; exit}')
+            after=$(awk '$1 == "go" {print $2; exit}' "${m}/go.mod")
+            if [[ -n "${before}" && "${before}" != "${after}" ]]; then
+              echo "::error file=${m}/go.mod::go directive changed ${before} -> ${after}. Published modules keep their minimum Go version; pin or ignore the dependency that requires the newer Go (see .github/dependabot.yml), or apply the 'go-version-bump' label."
+              failed=1
+            fi
+          done
+          exit "${failed}"
+
+  lint:
+    name: Lint (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [ '.', 'integrations/gin', 'clients/adminapi' ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          working-directory: ${{ matrix.module }}
+          args: --timeout=5m
+
+  vuln:
+    name: Vulnerability Scan (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [ '.', 'integrations/gin', 'clients/adminapi' ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@${{ env.GOVULNCHECK_VERSION }}
+
+      - name: Run govulncheck
+        working-directory: ${{ matrix.module }}
+        run: govulncheck ./...
+
+  test:
+    name: Test (core)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0  # Fetch all history for comparison
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run tests with coverage (HEAD)
+        run: |
+          go test -v -race ./pkg/...
+          .github/scripts/compute-coverage.sh head
+
+      - name: Compute base coverage (PR only)
+        if: github.event_name == 'pull_request'
+        id: base-coverage
+        continue-on-error: true
+        run: .github/scripts/compute-coverage.sh base "${{ github.event.pull_request.base.ref }}"
+
+      - name: Compare coverage (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          HEAD="${HEAD_COVERAGE:-0}"
+          BASE="${BASE_COVERAGE:-}"
+
+          # If base coverage couldn't be computed (e.g., base branch doesn't have the code yet)
+          if [[ -z "$BASE" ]]; then
+            echo "ℹ️ Base branch doesn't have coverage data yet. Skipping comparison." >> "${GITHUB_STEP_SUMMARY}"
+            echo "📊 Coverage (Head): ${HEAD}%"
+            echo "✅ Tests passed with ${HEAD}% coverage" >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+
+          echo "📊 Coverage Comparison:"
+          echo "  Base:    ${BASE}%"
+          echo "  Head:    ${HEAD}%"
+
+          if (( $(echo "$HEAD < $BASE" | bc -l) )); then
+            DIFF=$(echo "$BASE - $HEAD" | bc -l)
+            echo "❌ Coverage decreased by ${DIFF}%" >> "${GITHUB_STEP_SUMMARY}"
+            echo "❌ Coverage decreased by ${DIFF}%"
+            exit 1
+          else
+            DIFF=$(echo "$HEAD - $BASE" | bc -l)
+            echo "✅ Coverage maintained or improved (+${DIFF}%)" >> "${GITHUB_STEP_SUMMARY}"
+            echo "✅ Coverage maintained or improved (+${DIFF}%)"
+          fi
+
+  test-integrations:
+    name: Test (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [ 'integrations/gin', 'clients/adminapi' ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run tests
+        working-directory: ${{ matrix.module }}
+        run: go test -v -race ./...
+
+      - name: Check coverage (clients/adminapi)
+        if: matrix.module == 'clients/adminapi'
+        working-directory: ${{ matrix.module }}
+        run: |
+          # Test helpers under internal/ are not production code.
+          go test -covermode=atomic -coverprofile=coverage.out $(go list ./... | grep -v /internal/)
+          total=$(go tool cover -func=coverage.out | awk '/^total:/ { sub(/%/, "", $3); print $3 }')
+          echo "📊 Coverage: ${total}% (minimum 80%)" >> "${GITHUB_STEP_SUMMARY}"
+          if (( $(echo "$total < 80" | bc -l) )); then
+            echo "❌ Coverage ${total}% is below 80%"
+            exit 1
+          fi
+
+  # The examples are not released, but they are what users copy first, so they
+  # must keep building and passing their tests. gin-service tests its Redis
+  # token storage against miniredis, so no Docker services are needed.
+  examples:
+    name: Example (${{ matrix.example }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [ 'vanilla-service', 'gin-service', 'admin-extension' ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build
+        working-directory: examples/${{ matrix.example }}
+        run: go build ./...
+
+      - name: Vet
+        working-directory: examples/${{ matrix.example }}
+        run: go vet ./...
+
+      - name: Test
+        working-directory: examples/${{ matrix.example }}
+        run: go test -race ./...
+
+  test-benchmarks:
+    name: Test Benchmarks (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: '.'
+            pkgs: './pkg/...'
+          - module: 'integrations/gin'
+            pkgs: './...'
+          - module: 'clients/adminapi'
+            pkgs: './...'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run benchmarks
+        working-directory: ${{ matrix.module }}
+        run: go test -bench=. -benchmem -run=^$ ${{ matrix.pkgs }}
+
+  build:
+    name: Build (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: '.'
+            pkgs: './pkg/...'
+          - module: 'integrations/gin'
+            pkgs: './...'
+          - module: 'clients/adminapi'
+            pkgs: './...'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build
+        working-directory: ${{ matrix.module }}
+        run: go build -v ${{ matrix.pkgs }}

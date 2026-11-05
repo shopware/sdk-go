@@ -1,0 +1,6 @@
+# Keep local state and docs out of the image build context
+data/
+*.db
+*.db-*
+.env
+*.md

@@ -1,0 +1,61 @@
+# Contributing
+
+Thanks for helping improve the Shopware App SDK for Go. Keep contributions focused, tested, and aligned with the SDK's minimal, optional-by-default design.
+
+## Development Setup
+
+```bash
+go mod download
+go test ./pkg/...
+```
+
+Use Go 1.26 or newer. The SDK supports the two most recent major Go releases
+(currently Go 1.26 and 1.27); see the Go version support policy in the README.
+Use the latest patch release of your line, otherwise the `govulncheck` job will
+fail your pull request on standard-library advisories that are already fixed
+upstream. The exact patch CI builds with is pinned as `GO_VERSION` in
+[.github/workflows/ci.yml](.github/workflows/ci.yml) and mirrored by
+`ARG GO_VERSION` in [.devcontainer/Dockerfile](.devcontainer/Dockerfile) — keep
+the two in sync when bumping, and update the recommended patch in the README
+and SECURITY.md.
+
+## Expected Checks
+
+Before opening a pull request, run the checks that match your change:
+
+```bash
+go test ./pkg/...
+go test -race ./pkg/...
+(cd clients/adminapi && go test -race ./...)
+go test ./examples/vanilla-service
+(cd examples/gin-service && go test ./...)
+(cd examples/admin-extension && go test ./...)
+golangci-lint run ./...
+```
+
+For benchmark or performance-sensitive changes:
+
+```bash
+.github/scripts/run-benchmarks.sh
+```
+
+## Design Principles
+
+- Keep the core SDK small and framework-neutral where practical.
+- Make cross-cutting concerns optional, including logging, retry logic, caching, and observability.
+- Prefer interfaces at package boundaries when they reduce coupling.
+- Avoid panics in library code; return structured errors instead.
+- Preserve context propagation and request cancellation.
+- Update examples and docs when public behavior changes.
+
+## Pull Request Guidelines
+
+- Use a semantic PR title such as `fix: ...`, `feat: ...`, `docs: ...`, or `test: ...`.
+- Include tests for behavior changes.
+- Keep unrelated refactors out of feature or bugfix PRs.
+- Explain any public API change in the PR description.
+- For user-visible changes, update README or `/docs`.
+
+## Roadmap And Decisions
+
+Roadmap decisions are made in public GitHub issues. Small bugfixes can go straight to PR. Larger features should start with an issue describing the user problem, proposed API shape, alternatives considered, and compatibility impact.

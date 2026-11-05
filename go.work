@@ -1,0 +1,16 @@
+go 1.26.10
+
+use (
+	.
+	./clients/adminapi
+	./examples/admin-extension
+	./examples/gin-service
+	./examples/vanilla-service
+	./integrations/gin
+)
+
+replace github.com/shopware/app-sdk-go v1.3.0 => .
+
+replace github.com/shopware/app-sdk-go/integrations/gin v1.3.0 => ./integrations/gin
+
+replace github.com/shopware/app-sdk-go/clients/adminapi v1.0.0 => ./clients/adminapi
