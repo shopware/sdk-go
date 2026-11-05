@@ -3,7 +3,7 @@ set -euo pipefail
 
 MODE="${1:-head}" # head or base
 BASE_REF="${2:-}" # required if MODE=base
-PKG_PREFIX="${PKG_PREFIX:-github.com/shopware/app-sdk-go}"
+PKG_PREFIX="${PKG_PREFIX:-github.com/shopware/sdk-go}"
 ALL_OUT="all_coverage-report.out"
 OUT="coverage-${MODE}.out"
 
@@ -26,8 +26,8 @@ if [[ "$MODE" == "base" ]]; then
   cd "$WT_DIR"
 fi
 
-# Get all packages matching prefix (only pkg/, exclude examples)
-pkgs="$(go list ./pkg/... | grep "^${PKG_PREFIX}" || true)"
+# Get all core module packages (nested modules and examples are excluded by ./...)
+pkgs="$(go list ./... | grep "^${PKG_PREFIX}" || true)"
 if [[ -z "${pkgs}" ]]; then
     echo "ERROR: no packages match prefix ${PKG_PREFIX}" >&2
     exit 3

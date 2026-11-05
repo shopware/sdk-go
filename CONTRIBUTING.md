@@ -1,12 +1,12 @@
 # Contributing
 
-Thanks for helping improve the Shopware App SDK for Go. Keep contributions focused, tested, and aligned with the SDK's minimal, optional-by-default design.
+Thanks for helping improve the Shopware SDK for Go. Keep contributions focused, tested, and aligned with the SDK's minimal, optional-by-default design.
 
 ## Development Setup
 
 ```bash
 go mod download
-go test ./pkg/...
+go test ./...
 ```
 
 Use Go 1.26 or newer. The SDK supports the two most recent major Go releases
@@ -24,8 +24,8 @@ and SECURITY.md.
 Before opening a pull request, run the checks that match your change:
 
 ```bash
-go test ./pkg/...
-go test -race ./pkg/...
+go test ./...
+go test -race ./...
 (cd clients/adminapi && go test -race ./...)
 go test ./examples/vanilla-service
 (cd examples/gin-service && go test ./...)

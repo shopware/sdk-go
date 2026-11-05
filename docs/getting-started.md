@@ -7,22 +7,21 @@ This guide shows the fastest local path for building a Shopware app backend with
 Core SDK (framework-agnostic, no Gin/zap in the dependency graph):
 
 ```bash
-go get github.com/shopware/app-sdk-go
+go get github.com/shopware/sdk-go
 ```
 
 Gin integration (separate module, pulls in Gin only here):
 
 ```bash
-go get github.com/shopware/app-sdk-go/integrations/gin
+go get github.com/shopware/sdk-go/integrations/gin
 ```
 
 Use Go 1.26 or newer (the SDK supports the two most recent major Go releases —
 currently Go 1.26 and 1.27; see the README's version support policy). Prefer the
 latest patch release of your line — see the recommended patch under
-[Requirements](../README.md#requirements). The repository is a multi-module Go workspace; the current
-release line is `v1.3.0` (core and `integrations/gin`; the Admin API client
-`clients/adminapi` is at `v1.0.0` — each module is versioned independently, see
-[RELEASING.md](RELEASING.md)).
+[Requirements](../README.md#requirements). The repository is a multi-module Go workspace; each module (core,
+`integrations/gin`, `clients/adminapi`) is versioned independently, see
+[RELEASING.md](RELEASING.md).
 
 ## Gin Quick Start
 
@@ -33,8 +32,8 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
-	"github.com/shopware/app-sdk-go/pkg/store"
+	ginintegration "github.com/shopware/sdk-go/integrations/gin"
+	"github.com/shopware/sdk-go/store"
 )
 
 func main() {
@@ -108,12 +107,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/shopware/app-sdk-go/pkg/app"
-	sdkerrors "github.com/shopware/app-sdk-go/pkg/errors"
-	"github.com/shopware/app-sdk-go/pkg/registration"
-	"github.com/shopware/app-sdk-go/pkg/signature"
-	"github.com/shopware/app-sdk-go/pkg/store"
-	"github.com/shopware/app-sdk-go/pkg/webhook"
+	"github.com/shopware/sdk-go/app"
+	"github.com/shopware/sdk-go/sdkerrors"
+	"github.com/shopware/sdk-go/registration"
+	"github.com/shopware/sdk-go/signature"
+	"github.com/shopware/sdk-go/store"
+	"github.com/shopware/sdk-go/webhook"
 )
 
 func main() {

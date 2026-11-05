@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi/internal/assert"
+	"github.com/shopware/sdk-go/clients/adminapi/internal/assert"
 )
 
 var (

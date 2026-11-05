@@ -2,7 +2,7 @@ package adminapi
 
 import "runtime/debug"
 
-const modulePath = "github.com/shopware/app-sdk-go/clients/adminapi"
+const modulePath = "github.com/shopware/sdk-go/clients/adminapi"
 
 // develVersion is the version Go records for a module built from local
 // source: the main module, a go.work module or a replaced module.
@@ -14,7 +14,7 @@ const fallbackVersion = "dev"
 
 // DefaultUserAgent is sent as User-Agent unless Config.UserAgent is set. It
 // contains the module version when the build information has it.
-var DefaultUserAgent = "shopware-app-sdk-go-adminapi/" + moduleVersion()
+var DefaultUserAgent = "shopware-sdk-go-adminapi/" + moduleVersion()
 
 func moduleVersion() string {
 	info, ok := debug.ReadBuildInfo()

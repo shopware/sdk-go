@@ -45,7 +45,7 @@ With [go-redis](https://github.com/redis/go-redis), implement
 ```go
 import (
     "github.com/redis/go-redis/v9"
-    "github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+    "github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 type redisStore struct{ rdb redis.UniversalClient }
@@ -80,7 +80,7 @@ changes. With the [valkey-go](https://github.com/valkey-io/valkey-go) driver:
 ```go
 import (
     "github.com/valkey-io/valkey-go"
-    "github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+    "github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 type valkeyStore struct{ client valkey.Client }

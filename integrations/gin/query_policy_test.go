@@ -10,12 +10,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
-	"github.com/shopware/app-sdk-go/integrations/gin/internal/testutil"
-	"github.com/shopware/app-sdk-go/pkg/app"
-	sdkerrors "github.com/shopware/app-sdk-go/pkg/errors"
-	"github.com/shopware/app-sdk-go/pkg/resolver"
-	"github.com/shopware/app-sdk-go/pkg/store"
+	"github.com/shopware/sdk-go/app"
+	ginintegration "github.com/shopware/sdk-go/integrations/gin"
+	"github.com/shopware/sdk-go/integrations/gin/internal/testutil"
+	"github.com/shopware/sdk-go/resolver"
+	"github.com/shopware/sdk-go/sdkerrors"
+	"github.com/shopware/sdk-go/store"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

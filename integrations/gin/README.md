@@ -1,6 +1,6 @@
-# Gin Integration for Shopware App SDK
+# Gin Integration for the Shopware SDK for Go
 
-This module connects the Shopware App SDK and the [Gin web framework](https://github.com/gin-gonic/gin).
+This module connects the Shopware SDK for Go and the [Gin web framework](https://github.com/gin-gonic/gin).
 
 ## Features
 
@@ -14,7 +14,7 @@ This module connects the Shopware App SDK and the [Gin web framework](https://gi
 ## Installation
 
 ```bash
-go get github.com/shopware/app-sdk-go/integrations/gin
+go get github.com/shopware/sdk-go/integrations/gin
 ```
 
 ## Quick Start
@@ -28,8 +28,8 @@ import (
 
     "github.com/gin-gonic/gin"
 
-    ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
-    "github.com/shopware/app-sdk-go/pkg/store"
+    ginintegration "github.com/shopware/sdk-go/integrations/gin"
+    "github.com/shopware/sdk-go/store"
 )
 
 func main() {
@@ -137,7 +137,7 @@ import (
     "log/slog"
     "os"
 
-    "github.com/shopware/app-sdk-go/pkg/app"
+    "github.com/shopware/sdk-go/app"
 )
 
 log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -193,7 +193,7 @@ router.POST("/app/webhook/custom", func(c *gin.Context) {
 ## Adding Action Button Handlers
 
 ```go
-import "github.com/shopware/app-sdk-go/pkg/response"
+import "github.com/shopware/sdk-go/response"
 
 router.POST("/app/action/export-product", func(c *gin.Context) {
     shop, exists := ginintegration.GetShop(c)
@@ -236,7 +236,7 @@ func handler(c *gin.Context) {
 Retrieves the verified webhook event:
 
 ```go
-import "github.com/shopware/app-sdk-go/pkg/webhook"
+import "github.com/shopware/sdk-go/webhook"
 
 func webhookHandler(c *gin.Context) {
     event, exists := ginintegration.GetVerifiedEvent(c)
@@ -303,7 +303,7 @@ err := ginintegration.Configure(router, ginintegration.Config{
 The integration automatically handles SDK errors and returns appropriate HTTP responses:
 
 ```go
-import sdkerrors "github.com/shopware/app-sdk-go/pkg/errors"
+import "github.com/shopware/sdk-go/sdkerrors"
 
 // SDK errors are automatically converted to HTTP responses:
 // - TypeInvalidSignature    -> 401 Unauthorized

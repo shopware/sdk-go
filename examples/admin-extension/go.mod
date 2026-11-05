@@ -1,13 +1,13 @@
-module github.com/shopware/app-sdk-go/examples/admin-extension
+module github.com/shopware/sdk-go/examples/admin-extension
 
 go 1.26.10
 
 require (
 	github.com/gin-contrib/cors v1.7.10
 	github.com/gin-gonic/gin v1.12.0
-	github.com/shopware/app-sdk-go v1.3.0
-	github.com/shopware/app-sdk-go/clients/adminapi v1.0.0
-	github.com/shopware/app-sdk-go/integrations/gin v1.3.0
+	github.com/shopware/sdk-go v1.0.0
+	github.com/shopware/sdk-go/clients/adminapi v1.0.0
+	github.com/shopware/sdk-go/integrations/gin v1.0.0
 )
 
 require (

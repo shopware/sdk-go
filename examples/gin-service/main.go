@@ -15,11 +15,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi"
-	ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
-	"github.com/shopware/app-sdk-go/pkg/app"
-	"github.com/shopware/app-sdk-go/pkg/store"
-	"github.com/shopware/app-sdk-go/pkg/webhook"
+	"github.com/shopware/sdk-go/app"
+	"github.com/shopware/sdk-go/clients/adminapi"
+	ginintegration "github.com/shopware/sdk-go/integrations/gin"
+	"github.com/shopware/sdk-go/store"
+	"github.com/shopware/sdk-go/webhook"
 )
 
 const (

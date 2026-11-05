@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+	"github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 // mapStore stands in for Redis or Valkey. A real implementation calls the

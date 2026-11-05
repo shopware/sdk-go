@@ -1,6 +1,6 @@
-# Agent Guidelines for Shopware App SDK Go
+# Agent Guidelines for Shopware SDK for Go
 
-This document provides comprehensive guidelines for maintaining and developing the Shopware App SDK for Go. Follow these patterns and best practices to ensure consistency, quality, and maintainability.
+This document provides comprehensive guidelines for maintaining and developing the Shopware SDK for Go. Follow these patterns and best practices to ensure consistency, quality, and maintainability.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ This document provides comprehensive guidelines for maintaining and developing t
 
 ## Project Overview
 
-The Shopware App SDK for Go is a library that simplifies building Shopware apps in Go. It provides:
+The Shopware SDK for Go is a library that simplifies building Shopware apps and talking to the Shopware Admin API in Go. It provides:
 
 - **Registration flow**: Handle app registration with Shopware stores
 - **Webhook handling**: Verify and process webhooks from Shopware
@@ -103,7 +103,7 @@ The SDK provides optional features that users can opt into:
 Store retry logic is NOT built-in. Users can wrap any store with retry middleware:
 
 ```go
-import "github.com/shopware/app-sdk-go/pkg/store/middleware"
+import "github.com/shopware/sdk-go/store/middleware"
 
 baseStore, _ := store.NewDynamoDBStore(store.DynamoDBConfig{...})
 storeWithRetry := middleware.NewRetryMiddleware(baseStore, middleware.RetryConfig{
@@ -119,7 +119,7 @@ live in memory by default; set `app.Config.TokenStorage` to share them between
 instances (Redis, Valkey, ...) without adding a driver dependency to the SDK:
 
 ```go
-import adminstorage "github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+import adminstorage "github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 
 sdk, err := app.New(app.Config{
     // ...
@@ -156,20 +156,20 @@ ginintegration.Configure(router, ginintegration.Config{
 ### Package Structure
 
 ```
-pkg/
+.                     # Core module: github.com/shopware/sdk-go
 ├── app/              # Core SDK orchestration
-├── errors/           # Custom error types
-├── integration/      # Framework integrations (gin)
 ├── internal/         # Internal utilities (not exported)
 │   └── testutil/     # Shared test utilities
-├── logger/           # Logging abstraction (for integrations)
 ├── registration/     # App registration flow
 ├── resolver/         # Shop context resolution
 ├── response/         # HTTP response builders
+├── sdkerrors/        # Custom error types
 ├── signature/        # Signature verification utilities
 ├── store/            # Persistence abstraction
 │   └── middleware/   # Optional store middleware (retry, logging, etc.)
-└── webhook/          # Webhook handling
+├── webhook/          # Webhook handling
+├── clients/adminapi/ # Admin API client (separate module)
+└── integrations/gin/ # Gin integration (separate module)
 ```
 
 ### File Naming
@@ -251,13 +251,13 @@ type Shop struct {
 
 ### Custom Error Types
 
-Use custom error types from `pkg/errors` for domain-specific errors:
+Use custom error types from `sdkerrors` for domain-specific errors:
 
 ```go
-import "github.com/shopware/app-sdk-go/pkg/errors"
+import "github.com/shopware/sdk-go/sdkerrors"
 
 if !shop.Active {
-    return nil, errors.NewShopNotActive(shop.ShopID)
+    return nil, sdkerrors.NewShopNotActive(shop.ShopID)
 }
 ```
 
@@ -408,7 +408,7 @@ func TestResolveFromQuery_ErrorPaths(t *testing.T) {
 
 **When NOT to use `t.Parallel()`**: tests sharing mutable state (store suites, mock servers, shared counters).
 
-### Shared test helpers (`pkg/internal/testutil`)
+### Shared test helpers (`internal/testutil`)
 
 Reuse the helpers in `testutil/` instead of reimplementing patterns in each test file.
 
@@ -616,7 +616,7 @@ When working with shop active state:
 ```go
 // Checking if shop is active
 if !shop.Active {
-    return nil, errors.NewShopNotActive(shop.ShopID)
+    return nil, sdkerrors.NewShopNotActive(shop.ShopID)
 }
 
 // Setting shop active state
@@ -871,8 +871,8 @@ package main
 import (
     "log"
 
-    "github.com/shopware/app-sdk-go/pkg/app"
-    "github.com/shopware/app-sdk-go/pkg/store"
+    "github.com/shopware/sdk-go/app"
+    "github.com/shopware/sdk-go/store"
 )
 
 func main() {
@@ -909,8 +909,8 @@ func main() {
 
 Before submitting code for review, verify:
 
-- [ ] All tests pass (`go test ./pkg/... -race -count=1`)
-- [ ] Linting passes (`golangci-lint run ./pkg/...`)
+- [ ] All tests pass (`go test ./... -race -count=1`)
+- [ ] Linting passes (`golangci-lint run ./...`)
 - [ ] Code is formatted (`go fmt ./...`)
 - [ ] Documentation is updated
 - [ ] No panics in library code
@@ -941,7 +941,7 @@ Before submitting code for review, verify:
 10. **Missing tests**: Test error paths, not just happy paths
 11. **Mixing raw `t.Errorf` with testify**: Pick one — we use testify exclusively
 12. **Discarding errors in tests** (`_, _ :=`): Always check errors with `require.NoError`
-13. **Duplicating testutil helpers**: Check `pkg/internal/testutil/` before writing a new fixture or assertion helper
+13. **Duplicating testutil helpers**: Check `internal/testutil/` before writing a new fixture or assertion helper
 14. **Defining per-file mock stores**: Use `testutil.MockShopStore` instead
 15. **Calling `assert`/`require` inside goroutines**: Collect errors via channel, assert after `wg.Wait()`
 

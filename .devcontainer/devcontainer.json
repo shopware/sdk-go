@@ -1,5 +1,5 @@
 {
-  "name": "app-sdk-go (Go 1.26)",
+  "name": "sdk-go (Go 1.26)",
   "build": { "dockerfile": "Dockerfile" },
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}

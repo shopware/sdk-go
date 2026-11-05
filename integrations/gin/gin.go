@@ -12,13 +12,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shopware/app-sdk-go/pkg/app"
-	sdkerrors "github.com/shopware/app-sdk-go/pkg/errors"
-	"github.com/shopware/app-sdk-go/pkg/registration"
-	"github.com/shopware/app-sdk-go/pkg/resolver"
-	"github.com/shopware/app-sdk-go/pkg/signature"
-	"github.com/shopware/app-sdk-go/pkg/store"
-	"github.com/shopware/app-sdk-go/pkg/webhook"
+	"github.com/shopware/sdk-go/app"
+	"github.com/shopware/sdk-go/registration"
+	"github.com/shopware/sdk-go/resolver"
+	"github.com/shopware/sdk-go/sdkerrors"
+	"github.com/shopware/sdk-go/signature"
+	"github.com/shopware/sdk-go/store"
+	"github.com/shopware/sdk-go/webhook"
 )
 
 // Config defines the configuration for integrating the Shopware SDK with Gin

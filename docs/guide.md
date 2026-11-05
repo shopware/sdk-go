@@ -66,15 +66,12 @@ offers `Put`, `Patch`, `Delete`, `RequestRaw` for uploads, request options such 
 With only a shop ID, for example in a background job, use
 `sdk.NewClient(ctx, shopID)`; it loads the shop from the store.
 
-> **Upgrading from v1.2?** v1.3.0 replaces the old `pkg/client` with this client. See the
-> [migration guide](MIGRATION.md#admin-api-client-v130).
-
 ## Response Builders
 
 Type-safe response builders for common Shopware response types:
 
 ```go
-import "github.com/shopware/app-sdk-go/pkg/response"
+import "github.com/shopware/sdk-go/response"
 
 // Notifications
 resp := response.NotificationSuccess("Operation completed")
@@ -132,7 +129,7 @@ All stores implement the `ShopStore` interface and are safe for concurrent use.
 The SDK uses a unified error type with structured information:
 
 ```go
-import sdkerrors "github.com/shopware/app-sdk-go/pkg/errors"
+import "github.com/shopware/sdk-go/sdkerrors"
 
 // Check error type
 var sdkErr *sdkerrors.Error
@@ -164,8 +161,8 @@ Add automatic retry logic with exponential backoff to any store:
 
 ```go
 import (
-    "github.com/shopware/app-sdk-go/pkg/store"
-    "github.com/shopware/app-sdk-go/pkg/store/middleware"
+    "github.com/shopware/sdk-go/store"
+    "github.com/shopware/sdk-go/store/middleware"
 )
 
 // Create base store
@@ -201,7 +198,7 @@ Implement three methods with the driver you already use; the SDK adds no driver
 dependency:
 
 ```go
-import adminstorage "github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+import adminstorage "github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 
 type redisStore struct{ rdb *redis.Client }
 
@@ -245,7 +242,7 @@ tokens are kept, encryption and security tips.
 
 ## Logging
 
-The SDK core does not log — it returns typed errors (see `pkg/errors`) and leaves
+The SDK core does not log — it returns typed errors (see `sdkerrors`) and leaves
 logging to the caller. Integrations log through the standard library `log/slog`. Pass
 a `*slog.Logger` to the Gin integration; if omitted it uses a no-op logger. See
 [ADR 0002](adr/0002-no-logging-in-core.md).
@@ -255,7 +252,7 @@ import (
     "log/slog"
     "os"
 
-    ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
+    ginintegration "github.com/shopware/sdk-go/integrations/gin"
 )
 
 log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -346,20 +343,19 @@ func TestMyHandler(t *testing.T) {
 Multi-module workspace (see [go.work](../go.work)):
 
 ```
-app-sdk-go/                 - core module: github.com/shopware/app-sdk-go (no framework deps)
-├── pkg/
-│   ├── app/                - Main SDK entry point and configuration
-│   ├── errors/             - Unified error types and helpers
-│   ├── registration/       - Registration and confirmation handlers
-│   ├── resolver/           - Context resolver (shop resolution from requests)
-│   ├── response/           - Response builders for common types
-│   ├── signature/          - HMAC signature verification and generation
-│   ├── store/              - Shop persistence (memory, SQLite, DynamoDB)
-│   └── webhook/            - Webhook verification and processing
+sdk-go/                     - core module: github.com/shopware/sdk-go (no framework deps)
+├── app/                    - Main SDK entry point and configuration
+├── registration/           - Registration and confirmation handlers
+├── resolver/               - Context resolver (shop resolution from requests)
+├── response/               - Response builders for common types
+├── sdkerrors/              - Unified error types and helpers
+├── signature/              - HMAC signature verification and generation
+├── store/                  - Shop persistence (memory, SQLite, DynamoDB)
+├── webhook/                - Webhook verification and processing
 ├── clients/
-│   └── adminapi/           - Admin API client module (github.com/shopware/app-sdk-go/clients/adminapi)
+│   └── adminapi/           - Admin API client module (github.com/shopware/sdk-go/clients/adminapi)
 └── integrations/
-    └── gin/                - Gin integration module (github.com/shopware/app-sdk-go/integrations/gin)
+    └── gin/                - Gin integration module (github.com/shopware/sdk-go/integrations/gin)
 ```
 
 The core module logs nothing and depends on no web framework. Each integration is a

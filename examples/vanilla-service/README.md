@@ -265,7 +265,7 @@ http.ListenAndServeTLS(":443", "cert.pem", "key.pem", nil)
 
 6. **Optional: Add Retry Middleware for DynamoDB:**
 ```go
-import "github.com/shopware/app-sdk-go/pkg/store/middleware"
+import "github.com/shopware/sdk-go/store/middleware"
 
 baseStore, _ := store.NewDynamoDBStore(store.DynamoDBConfig{...})
 shopStore := middleware.NewRetryMiddleware(baseStore, middleware.RetryConfig{

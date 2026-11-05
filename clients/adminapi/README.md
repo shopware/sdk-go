@@ -1,6 +1,6 @@
 # Admin API client
 
-`github.com/shopware/app-sdk-go/clients/adminapi` is a Go client for the
+`github.com/shopware/sdk-go/clients/adminapi` is a Go client for the
 [Shopware Admin API](https://shopware.stoplight.io/docs/admin-api).
 
 It is a separate Go module, so it can be used without the rest of the app SDK
@@ -10,7 +10,7 @@ and its dependencies. It depends only on the standard library and
 ## Installation
 
 ```bash
-go get github.com/shopware/app-sdk-go/clients/adminapi
+go get github.com/shopware/sdk-go/clients/adminapi
 ```
 
 ## Quick start
@@ -123,7 +123,7 @@ proxies or instrumentation, pass your own `Config.HTTPClient` and wrap its
 
 ## Roadmap
 
-The app SDK uses this client since core `v1.3.0` (`App.NewClient`). Planned next: DAL
+The core SDK uses this client (`App.NewClient`). Planned next: DAL
 helpers (criteria, repositories, sync), the extension manager, media upload and a
 browser login for CLI tools. See [ADR 0003](../../docs/adr/0003-admin-api-client-module.md).
 

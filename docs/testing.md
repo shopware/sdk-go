@@ -5,8 +5,8 @@ Run checks from the repository root unless a command explicitly changes director
 ## Required Release Checks
 
 ```bash
-go test ./pkg/...
-go test -race ./pkg/...
+go test ./...
+go test -race ./...
 (cd clients/adminapi && go test -race ./...)
 (cd integrations/gin && go test -race ./...)
 (cd examples/vanilla-service && go test ./...)
@@ -20,14 +20,14 @@ golangci-lint run ./...
 
 ## Coverage
 
-The CI coverage script excludes `pkg/internal/testutil` because it is test support code, not production SDK behavior.
+The CI coverage script excludes `internal/testutil` because it is test support code, not production SDK behavior.
 
 ```bash
 .github/scripts/compute-coverage.sh head
 ```
 
 Production-package statement coverage of the core module, excluding
-`pkg/internal/testutil`: 98.5% (2026-11-04).
+`internal/testutil`: 98.5% (2026-11-04).
 
 ## Example Modules
 
@@ -46,7 +46,7 @@ Use the bounded benchmark script for release notes and README numbers:
 For deeper local investigation, run a full benchmark suite manually:
 
 ```bash
-go test -run '^$' -bench=. -benchmem ./pkg/...
+go test -run '^$' -bench=. -benchmem ./...
 ```
 
 The full suite can take noticeably longer because some storage benchmarks perform setup work outside the timed section. Use bounded runs for release readiness.

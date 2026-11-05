@@ -124,7 +124,7 @@ jobs:
 
       - name: Run tests with coverage (HEAD)
         run: |
-          go test -v -race ./pkg/...
+          go test -v -race ./...
           .github/scripts/compute-coverage.sh head
 
       - name: Compute base coverage (PR only)
@@ -236,7 +236,7 @@ jobs:
       matrix:
         include:
           - module: '.'
-            pkgs: './pkg/...'
+            pkgs: './...'
           - module: 'integrations/gin'
             pkgs: './...'
           - module: 'clients/adminapi'
@@ -263,7 +263,7 @@ jobs:
       matrix:
         include:
           - module: '.'
-            pkgs: './pkg/...'
+            pkgs: './...'
           - module: 'integrations/gin'
             pkgs: './...'
           - module: 'clients/adminapi'

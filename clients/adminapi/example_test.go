@@ -10,7 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi"
+	"github.com/shopware/sdk-go/clients/adminapi"
 )
 
 // newExampleShop starts a tiny fake shop so the examples run without a real

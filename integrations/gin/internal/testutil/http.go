@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/shopware/app-sdk-go/pkg/signature"
+	"github.com/shopware/sdk-go/signature"
 )
 
 // SignedQueryAt builds the query string of a signed GET request: it appends a

@@ -102,10 +102,6 @@ github.com/quic-go/quic-go v0.63.0 h1:LIFGHI4PFUhhw2dDD1ARHdCff143ffMHwZtbnbuJ78
 github.com/quic-go/quic-go v0.63.0/go.mod h1:RAro2j2yN9a9EiPACLHT9IB2NXCvGQmmo/alT0yYI0w=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec h1:W09IVJc94icq4NjY3clb7Lk8O1qJ8BdBEF8z0ibU0rE=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
-github.com/shopware/app-sdk-go v1.3.0 h1:kKFZnVg1pF3pPJHcJtBHop4H3I9P8j/X+HudnR8Ig1k=
-github.com/shopware/app-sdk-go v1.3.0/go.mod h1:zNofR4O35IAbGbapAUuzh8CZJ6kTu8MoSrPQSyxUi8w=
-github.com/shopware/app-sdk-go/clients/adminapi v1.0.0 h1:MFGgKzQYFugWqf+eXv5Zim3Pyyh+b1ir9hE6BRCrpZY=
-github.com/shopware/app-sdk-go/clients/adminapi v1.0.0/go.mod h1:3sWsfJac4uIFL71LGnV7qdgx+I+B+uZc+SQ0AFun+9k=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=

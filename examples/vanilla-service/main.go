@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi"
-	"github.com/shopware/app-sdk-go/pkg/app"
-	sdkerrors "github.com/shopware/app-sdk-go/pkg/errors"
-	"github.com/shopware/app-sdk-go/pkg/store"
-	"github.com/shopware/app-sdk-go/pkg/webhook"
+	"github.com/shopware/sdk-go/app"
+	"github.com/shopware/sdk-go/clients/adminapi"
+	"github.com/shopware/sdk-go/sdkerrors"
+	"github.com/shopware/sdk-go/store"
+	"github.com/shopware/sdk-go/webhook"
 )
 
 const (

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+	"github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 // staticTransport answers every request with a fixed body, so benchmarks

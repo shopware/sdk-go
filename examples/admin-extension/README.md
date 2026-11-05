@@ -471,7 +471,7 @@ signature = HMAC-SHA256(queryString, shopSecret)
 
 **SDK Resolver Verification:**
 ```go
-// pkg/resolver/resolver.go
+// resolver/resolver.go
 func (r *Resolver) ResolveFromQuery(req *http.Request) (*store.Shop, error) {
   shopID := req.URL.Query().Get("shop-id")
   sig := req.URL.Query().Get("shopware-shop-signature")
@@ -908,7 +908,7 @@ server: {
 - [Meteor Admin SDK](https://shopware-meteor.mintlify.app/admin-sdk)
 - [Admin Module Documentation](https://developer.shopware.com/docs/guides/plugins/apps/administration/)
 - [Shopware Go SDK](../../README.md)
-- [Context Resolver](../../pkg/resolver/README.md)
+- [Context Resolver](../../resolver/README.md)
 
 ## What You Learned
 

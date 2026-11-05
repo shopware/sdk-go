@@ -1,4 +1,4 @@
-module github.com/shopware/app-sdk-go
+module github.com/shopware/sdk-go
 
 go 1.26.0
 
@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.33.13
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.21.17
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.72.3
-	github.com/shopware/app-sdk-go/clients/adminapi v1.0.0
+	github.com/shopware/sdk-go/clients/adminapi v1.0.0
 	github.com/stretchr/testify v1.12.1
 	modernc.org/sqlite v1.61.1
 )

@@ -12,9 +12,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/shopware/app-sdk-go/examples/admin-extension/auth"
-	"github.com/shopware/app-sdk-go/pkg/app"
-	"github.com/shopware/app-sdk-go/pkg/store"
+	"github.com/shopware/sdk-go/app"
+	"github.com/shopware/sdk-go/examples/admin-extension/auth"
+	"github.com/shopware/sdk-go/store"
 )
 
 // fakeShopware answers the Admin API requests of the dashboard.

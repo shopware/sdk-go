@@ -10,7 +10,7 @@ import (
 
 	"golang.org/x/sync/singleflight"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+	"github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 // Client is an authenticated client for the Shopware Admin API.

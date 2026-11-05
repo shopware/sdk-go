@@ -13,7 +13,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	adminstorage "github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+	adminstorage "github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 const (

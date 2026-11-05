@@ -14,6 +14,6 @@
 // encrypting them with WithCipher when you use NewKV.
 //
 // The guide at
-// https://github.com/shopware/app-sdk-go/blob/main/docs/token-storage.md
+// https://github.com/shopware/sdk-go/blob/main/docs/token-storage.md
 // shows Redis and Valkey stores, key names, encryption and a Redis Locker.
 package tokenstorage

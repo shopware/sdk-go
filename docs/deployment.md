@@ -45,8 +45,8 @@ for several instances use a shared store such as DynamoDB.
 ## Framework Integration
 
 Framework adapters are split out of the core dependency graph. The core module
-(`github.com/shopware/app-sdk-go`) pulls in no web framework; the Gin adapter lives in
-its own module, `github.com/shopware/app-sdk-go/integrations/gin`, and is installed only
+(`github.com/shopware/sdk-go`) pulls in no web framework; the Gin adapter lives in
+its own module, `github.com/shopware/sdk-go/integrations/gin`, and is installed only
 if you need it. Apps that do not use Gin therefore carry no Gin dependencies.
 
 ## Production Checklist

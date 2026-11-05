@@ -5,7 +5,7 @@ ROOT="$(git rev-parse --show-toplevel)"
 cd "${ROOT}"
 
 BENCHTIME="${BENCHTIME:-100ms}"
-PKG_PREFIX="${PKG_PREFIX:-github.com/shopware/app-sdk-go}"
+PKG_PREFIX="${PKG_PREFIX:-github.com/shopware/sdk-go}"
 
 coverage_all="$(mktemp)"
 coverage_prod="$(mktemp)"
@@ -27,7 +27,7 @@ go test \
     -bench 'Benchmark(VerifyRegistration|VerifyWebhook|ComputeSignature_LargePayload|HandleRegistration|HandleConfirmation|InMemoryStore_(GetShopByID|UpdateShop|SetShopActive))$' \
     -benchmem \
     -benchtime="${BENCHTIME}" \
-    ./pkg/signature ./pkg/registration ./pkg/store
+    ./signature ./registration ./store
 echo
 
 # The Gin integration is a separate module, so its benchmarks run from its root.
@@ -41,7 +41,7 @@ echo "== Bounded Gin integration benchmarks =="
 echo
 
 echo "== Production coverage =="
-pkgs="$(go list ./pkg/... | grep "^${PKG_PREFIX}" || true)"
+pkgs="$(go list ./... | grep "^${PKG_PREFIX}" || true)"
 if [[ -z "${pkgs}" ]]; then
     echo "ERROR: no packages match prefix ${PKG_PREFIX}" >&2
     exit 3

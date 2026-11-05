@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
-	"github.com/shopware/app-sdk-go/integrations/gin/internal/testutil"
-	"github.com/shopware/app-sdk-go/pkg/signature"
+	ginintegration "github.com/shopware/sdk-go/integrations/gin"
+	"github.com/shopware/sdk-go/integrations/gin/internal/testutil"
+	"github.com/shopware/sdk-go/signature"
 )
 
 func BenchmarkRegistrationEndpoint(b *testing.B) {

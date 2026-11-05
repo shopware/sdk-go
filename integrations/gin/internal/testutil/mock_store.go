@@ -3,7 +3,7 @@ package testutil
 import (
 	"context"
 
-	"github.com/shopware/app-sdk-go/pkg/store"
+	"github.com/shopware/sdk-go/store"
 	"github.com/stretchr/testify/mock"
 )
 

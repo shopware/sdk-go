@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi/internal/assert"
-	"github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+	"github.com/shopware/sdk-go/clients/adminapi/internal/assert"
+	"github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 func TestGetSendsBearerAndAPIPrefix(t *testing.T) {

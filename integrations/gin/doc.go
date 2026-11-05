@@ -5,7 +5,7 @@
 //
 // # Quick Setup
 //
-//	import ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
+//	import ginintegration "github.com/shopware/sdk-go/integrations/gin"
 //
 //	router := gin.Default()
 //	err := ginintegration.Configure(router, ginintegration.Config{

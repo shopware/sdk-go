@@ -1,10 +1,10 @@
-module github.com/shopware/app-sdk-go/examples/vanilla-service
+module github.com/shopware/sdk-go/examples/vanilla-service
 
 go 1.26.0
 
 require (
-	github.com/shopware/app-sdk-go v1.3.0
-	github.com/shopware/app-sdk-go/clients/adminapi v1.0.0
+	github.com/shopware/sdk-go v1.0.0
+	github.com/shopware/sdk-go/clients/adminapi v1.0.0
 )
 
 require (

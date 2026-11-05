@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/shopware/app-sdk-go/integrations/gin/internal/testutil"
-	"github.com/shopware/app-sdk-go/pkg/app"
-	"github.com/shopware/app-sdk-go/pkg/signature"
-	"github.com/shopware/app-sdk-go/pkg/store"
+	"github.com/shopware/sdk-go/app"
+	"github.com/shopware/sdk-go/integrations/gin/internal/testutil"
+	"github.com/shopware/sdk-go/signature"
+	"github.com/shopware/sdk-go/store"
 )
 
 //nolint:gochecknoinits // Required to set Gin to test mode before any tests run

@@ -1,12 +1,14 @@
-# Shopware App SDK for Go
+# Shopware SDK for Go
 
-[![CI](https://github.com/shopware/app-sdk-go/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/shopware/app-sdk-go/actions/workflows/ci.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/shopware/app-sdk-go.svg)](https://pkg.go.dev/github.com/shopware/app-sdk-go)
+[![CI](https://github.com/shopware/sdk-go/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/shopware/sdk-go/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/shopware/sdk-go.svg)](https://pkg.go.dev/github.com/shopware/sdk-go)
 [![Go Version](https://img.shields.io/badge/Go-1.26+-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Go SDK for building [Shopware 6 apps](https://developer.shopware.com/docs/guides/plugins/apps/):
-app registration, signed webhooks and requests, shop storage and an Admin API client.
+Go SDK for Shopware 6: everything needed to build
+[Shopware apps](https://developer.shopware.com/docs/guides/plugins/apps/) — app
+registration, signed webhooks and requests, shop storage — and an Admin API client
+that also works on its own, without the App System (CLI tools, workers, integrations).
 
 ## Features
 
@@ -28,23 +30,21 @@ that you install only if you need them.
 Core SDK (no framework dependencies):
 
 ```bash
-go get github.com/shopware/app-sdk-go
+go get github.com/shopware/sdk-go
 ```
 
 Gin integration (pulls in Gin only here):
 
 ```bash
-go get github.com/shopware/app-sdk-go/integrations/gin
+go get github.com/shopware/sdk-go/integrations/gin
 ```
 
 Admin API client only (no app-system code, no storage dependencies). The SDK uses it
 under the hood; install it on its own for CLI tools, workers or integrations:
 
 ```bash
-go get github.com/shopware/app-sdk-go/clients/adminapi
+go get github.com/shopware/sdk-go/clients/adminapi
 ```
-
-Upgrading from an older version? See [docs/MIGRATION.md](docs/MIGRATION.md).
 
 ## Quick Start with Gin (Recommended)
 
@@ -57,8 +57,8 @@ import (
     "log"
     
     "github.com/gin-gonic/gin"
-    ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
-    "github.com/shopware/app-sdk-go/pkg/store"
+    ginintegration "github.com/shopware/sdk-go/integrations/gin"
+    "github.com/shopware/sdk-go/store"
 )
 
 func main() {
@@ -141,12 +141,11 @@ The client is also available as a standalone module for CLI tools and workers. S
 | [Usage Guide](docs/guide.md) | Admin API client, response builders, storage, errors, retries, logging, security features |
 | [Deployment](docs/deployment.md) | Stores, runtime requirements, production checklist |
 | [Storing Admin API Tokens](docs/token-storage.md) | Redis, Valkey, key names, encryption |
-| [Migration Guide](docs/MIGRATION.md) | Upgrading between versions |
 | [Testing](docs/testing.md) and [Benchmarks](docs/benchmarks.md) | Checks and performance baselines |
 | [Security Policy](SECURITY.md) | Threat model, replay protection, reporting vulnerabilities |
 | [Architecture decisions](docs/adr/) | Why the SDK is built the way it is |
 
-API reference: [pkg.go.dev](https://pkg.go.dev/github.com/shopware/app-sdk-go).
+API reference: [pkg.go.dev](https://pkg.go.dev/github.com/shopware/sdk-go).
 
 ## Examples
 
@@ -177,14 +176,14 @@ The repository contains three Go modules, each with its own version and tags:
 
 | Module | Import path |
 |---|---|
-| Core SDK | `github.com/shopware/app-sdk-go` |
-| Gin integration | `github.com/shopware/app-sdk-go/integrations/gin` |
-| Admin API client | `github.com/shopware/app-sdk-go/clients/adminapi` |
+| Core SDK | `github.com/shopware/sdk-go` |
+| Gin integration | `github.com/shopware/sdk-go/integrations/gin` |
+| Admin API client | `github.com/shopware/sdk-go/clients/adminapi` |
 
 All modules follow [Semantic Versioning](https://semver.org/). Breaking changes to a
 stable (`v1+`) module are released only as a new major version, after a deprecation
 period. Release notes are published on
-[GitHub Releases](https://github.com/shopware/app-sdk-go/releases); how releases are made
+[GitHub Releases](https://github.com/shopware/sdk-go/releases); how releases are made
 is described in [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Contributing
@@ -202,6 +201,6 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/shopware/app-sdk-go/issues)
+- **Issues**: [GitHub Issues](https://github.com/shopware/sdk-go/issues)
 - **Documentation**: [Shopware App Documentation](https://developer.shopware.com/docs/guides/plugins/apps/)
 - **Community**: [Shopware Community Slack](https://slack.shopware.com/)

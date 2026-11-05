@@ -1,4 +1,4 @@
-module github.com/shopware/app-sdk-go/examples/gin-service
+module github.com/shopware/sdk-go/examples/gin-service
 
 go 1.26.0
 
@@ -6,9 +6,9 @@ require (
 	github.com/alicebob/miniredis/v2 v2.40.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/redis/go-redis/v9 v9.23.0
-	github.com/shopware/app-sdk-go v1.3.0
-	github.com/shopware/app-sdk-go/clients/adminapi v1.0.0
-	github.com/shopware/app-sdk-go/integrations/gin v1.3.0
+	github.com/shopware/sdk-go v1.0.0
+	github.com/shopware/sdk-go/clients/adminapi v1.0.0
+	github.com/shopware/sdk-go/integrations/gin v1.0.0
 	github.com/stretchr/testify v1.12.1
 )
 

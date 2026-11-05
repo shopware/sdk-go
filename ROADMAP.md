@@ -1,7 +1,7 @@
 # Roadmap
 
 This page lists the main directions for the SDK. Plans can change; concrete work is
-tracked in [GitHub issues](https://github.com/shopware/app-sdk-go/issues). To propose a
+tracked in [GitHub issues](https://github.com/shopware/sdk-go/issues). To propose a
 feature, open an issue first (see [CONTRIBUTING.md](CONTRIBUTING.md#roadmap-and-decisions)).
 
 ## Admin API Client

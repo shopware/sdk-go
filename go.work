@@ -9,8 +9,8 @@ use (
 	./integrations/gin
 )
 
-replace github.com/shopware/app-sdk-go v1.3.0 => .
+replace github.com/shopware/sdk-go v1.0.0 => .
 
-replace github.com/shopware/app-sdk-go/integrations/gin v1.3.0 => ./integrations/gin
+replace github.com/shopware/sdk-go/integrations/gin v1.0.0 => ./integrations/gin
 
-replace github.com/shopware/app-sdk-go/clients/adminapi v1.0.0 => ./clients/adminapi
+replace github.com/shopware/sdk-go/clients/adminapi v1.0.0 => ./clients/adminapi

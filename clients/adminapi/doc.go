@@ -52,7 +52,7 @@
 // responses, proxies or instrumentation, pass your own Config.HTTPClient and
 // wrap its Transport.
 //
-// The package does not import the app SDK (github.com/shopware/app-sdk-go):
-// the dependency goes one way only, from the SDK to this module. See
-// docs/adr/0003-admin-api-client-module.md in the app-sdk-go repository.
+// The package does not import the core SDK (github.com/shopware/sdk-go):
+// the dependency goes one way only, from the core SDK to this module. See
+// https://github.com/shopware/sdk-go/blob/main/docs/adr/0003-admin-api-client-module.md.
 package adminapi

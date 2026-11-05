@@ -3,7 +3,7 @@
 ## Supported Versions
 
 Security fixes are released for the latest minor version of each module
-(`github.com/shopware/app-sdk-go`, `integrations/gin`, `clients/adminapi`). Upgrade to the
+(`github.com/shopware/sdk-go`, `integrations/gin`, `clients/adminapi`). Upgrade to the
 latest release to receive them. Older lines are supported only when the maintainers
 announce it in the release notes.
 
@@ -24,7 +24,7 @@ analytics, a copied link — replays forever unless the app parses the signed
 
 The SDK therefore applies a freshness policy on top of every signature. Because
 Shopware does not stamp every payload, the default differs per path — and each
-default is enforced by the parity tests in `pkg/resolver/policy_test.go`:
+default is enforced by the parity tests in `resolver/policy_test.go`:
 
 | Path | Timestamp | Active shop | Policy |
 | --- | --- | --- | --- |

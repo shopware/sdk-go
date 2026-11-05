@@ -193,9 +193,6 @@ linters:
           - gosec
           - noctx
           - staticcheck
-      - path: 'pkg/errors/'
-        text: 'var-naming: avoid package names that conflict with Go standard library package names'
-        linters: [revive]
 
 formatters:
   enable:

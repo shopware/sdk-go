@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi"
+	"github.com/shopware/sdk-go/clients/adminapi"
 )
 
 // exactTotalCount asks the DAL for the exact number of matching rows.

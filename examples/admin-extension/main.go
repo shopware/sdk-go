@@ -12,10 +12,10 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/shopware/app-sdk-go/examples/admin-extension/auth"
-	ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
-	"github.com/shopware/app-sdk-go/pkg/app"
-	"github.com/shopware/app-sdk-go/pkg/store"
+	"github.com/shopware/sdk-go/app"
+	"github.com/shopware/sdk-go/examples/admin-extension/auth"
+	ginintegration "github.com/shopware/sdk-go/integrations/gin"
+	"github.com/shopware/sdk-go/store"
 )
 
 const (

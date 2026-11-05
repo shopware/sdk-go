@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	adminstorage "github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+	adminstorage "github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 var discardLogger = slog.New(slog.DiscardHandler)

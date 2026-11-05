@@ -1,4 +1,4 @@
-module github.com/shopware/app-sdk-go/clients/adminapi
+module github.com/shopware/sdk-go/clients/adminapi
 
 go 1.26.0
 

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi/internal/assert"
+	"github.com/shopware/sdk-go/clients/adminapi/internal/assert"
 )
 
 func TestVersionFromBuildInfo(t *testing.T) {

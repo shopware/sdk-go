@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi/internal/assert"
-	"github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+	"github.com/shopware/sdk-go/clients/adminapi/internal/assert"
+	"github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 func TestNewClientValidatesConfig(t *testing.T) {
@@ -142,7 +142,7 @@ func TestNewClientDefaults(t *testing.T) {
 	_, isMemory := c.storage.(*tokenstorage.InMemory)
 	assert.True(t, isMemory, "default storage is in-memory")
 	assert.True(t, strings.HasPrefix(c.tokenKey, "v1:"), "default key is versioned")
-	assert.True(t, strings.HasPrefix(DefaultUserAgent, "shopware-app-sdk-go-adminapi/"))
+	assert.True(t, strings.HasPrefix(DefaultUserAgent, "shopware-sdk-go-adminapi/"))
 }
 
 func TestDefaultTokenKeyDependsOnShopAndIdentity(t *testing.T) {

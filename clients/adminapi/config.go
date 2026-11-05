@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
+	"github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 )
 
 const (

@@ -7,9 +7,9 @@ released independently. See [ADR 0001](adr/0001-multi-module-repository-structur
 
 | Module                | Import path                                          | Tag prefix             |
 |-----------------------|------------------------------------------------------|------------------------|
-| Core SDK              | `github.com/shopware/app-sdk-go`                     | `vX.Y.Z`               |
-| Gin integration       | `github.com/shopware/app-sdk-go/integrations/gin`    | `integrations/gin/vX.Y.Z` |
-| Admin API client      | `github.com/shopware/app-sdk-go/clients/adminapi`    | `clients/adminapi/vX.Y.Z` |
+| Core SDK              | `github.com/shopware/sdk-go`                     | `vX.Y.Z`                  |
+| Gin integration       | `github.com/shopware/sdk-go/integrations/gin`    | `integrations/gin/vX.Y.Z` |
+| Admin API client      | `github.com/shopware/sdk-go/clients/adminapi`    | `clients/adminapi/vX.Y.Z` |
 
 The `examples/*` modules are not published and carry no tags.
 
@@ -18,8 +18,8 @@ The `examples/*` modules are not published and carry no tags.
 Go derives the module version from a tag whose prefix is the module's path **inside the
 repository**:
 
-- Core: `git tag -a v1.3.0 -m "app-sdk-go v1.3.0"`
-- Gin integration: `git tag -a integrations/gin/v1.3.0 -m "integrations/gin v1.3.0"`
+- Core: `git tag -a v1.0.0 -m "sdk-go v1.0.0"`
+- Gin integration: `git tag -a integrations/gin/v1.0.0 -m "integrations/gin v1.0.0"`
 - Admin API client: `git tag -a clients/adminapi/v1.0.0 -m "clients/adminapi v1.0.0"`
 
 Use annotated (`-a`) or signed (`-s`) tags. A tag is permanent: once a version has been
@@ -36,7 +36,7 @@ Go requires the major version suffix in the module path for `v2` and above. Befo
 tagging `v2.0.0` of a module, its `go.mod` module path must end with `/v2`, e.g.:
 
 ```
-module github.com/shopware/app-sdk-go/integrations/fiber/v2
+module github.com/shopware/sdk-go/integrations/fiber/v2
 ```
 
 then tag `integrations/fiber/v2.0.0`. The same applies to the core module.
@@ -47,7 +47,7 @@ The modules depend on each other in one direction only
 ([ADR 0003](adr/0003-admin-api-client-module.md)):
 
 ```
-clients/adminapi  ←  app-sdk-go (core)  ←  integrations/gin  ←  examples/*
+clients/adminapi  ←  sdk-go (core)  ←  integrations/gin  ←  examples/*
 ```
 
 The client never imports the core, and the core never imports an integration.
@@ -71,24 +71,23 @@ The feature PR already sets the **upcoming** versions:
 
 CI builds against the local source through `go.work`, so the not-yet-existing
 versions are never downloaded. After the PR is merged, all modules are tagged on the
-**same merge commit**, in dependency order — no follow-up PR is needed. Version 1.3.0
-was released this way (`clients/adminapi/v1.0.0`, `v1.3.0`, `integrations/gin/v1.3.0`).
+**same merge commit**, in dependency order.
 
 Release checklist:
 
 1. Merge the PR and wait until CI on `main` is green. Never tag a red commit.
 2. Update your local `main`: `git checkout main && git pull origin main`.
 3. Check that every `require` names the versions you are about to tag:
-   `grep -rn "shopware/app-sdk-go" go.work go.mod */*/go.mod`.
+   `grep -rn "shopware/sdk-go" go.work go.mod */*/go.mod`.
 4. Tag and push in dependency order, each tag on the merge commit:
 
    ```bash
-   git tag -a clients/adminapi/v1.0.0 -m "clients/adminapi v1.0.0"
-   git push origin clients/adminapi/v1.0.0
-   git tag -a v1.3.0 -m "app-sdk-go v1.3.0"
-   git push origin v1.3.0
-   git tag -a integrations/gin/v1.3.0 -m "integrations/gin v1.3.0"
-   git push origin integrations/gin/v1.3.0
+   git tag -a clients/adminapi/v1.1.0 -m "clients/adminapi v1.1.0"
+   git push origin clients/adminapi/v1.1.0
+   git tag -a v1.2.0 -m "sdk-go v1.2.0"
+   git push origin v1.2.0
+   git tag -a integrations/gin/v1.2.0 -m "integrations/gin v1.2.0"
+   git push origin integrations/gin/v1.2.0
    ```
 
    Skip the modules that did not change.
@@ -102,7 +101,7 @@ If the feature PR did not pin the new versions:
 
 1. Tag and push the lower module (for example `clients/adminapi/v1.1.0`).
 2. Open a PR that bumps the `require` in the dependent modules and the examples
-   (`go get github.com/shopware/app-sdk-go/clients/adminapi@v1.1.0 && go mod tidy`).
+   (`go get github.com/shopware/sdk-go/clients/adminapi@v1.1.0 && go mod tidy`).
 3. Merge it, then tag the dependent module (for example `v1.4.0`), and repeat for the
    next level (`integrations/gin`) if it needs the new core.
 
@@ -125,7 +124,7 @@ tagged yet, for example core `v1.4.0`. Go cannot download its `go.mod`, so the P
 a temporary `replace` to `go.work`:
 
 ```
-replace github.com/shopware/app-sdk-go v1.4.0 => .
+replace github.com/shopware/sdk-go v1.4.0 => .
 ```
 
 - Pin the exact version: Go rejects a versionless `replace` for a module that is
@@ -162,10 +161,10 @@ per change, labeled **Feature**, **Bug Fix**, **Documentation**, or **Release**:
 ```markdown
 ## Module Highlights
 
-* `github.com/shopware/app-sdk-go`: v1.1.0
+* `github.com/shopware/sdk-go`: v1.1.0
   * **Feature**: Add slog-based request logging middleware.
   * **Bug Fix**: Fix HMAC validation for empty request bodies.
-* `github.com/shopware/app-sdk-go/integrations/gin`: integrations/gin/v1.0.1
+* `github.com/shopware/sdk-go/integrations/gin`: integrations/gin/v1.0.1
   * **Documentation**: Document router group usage.
 ```
 
@@ -193,9 +192,9 @@ module via a matrix. Coverage gating runs for the core module and `clients/admin
 A new module (for example `integrations/fiber` or `clients/storeapi`) is added in its
 own PR, before the code that uses it:
 
-1. Create `<path>/go.mod` with `module github.com/shopware/app-sdk-go/<path>` and the
-   same `go` directive as the other modules, plus `README.md` (and `LICENSE` when the
-   code has another origin).
+1. Create `<path>/go.mod` with `module github.com/shopware/sdk-go/<path>` and the
+   same `go` directive as the other modules, plus `README.md` and a copy of `LICENSE`
+   (pkg.go.dev looks for a license in each module).
 2. Add it to `use` in [`go.work`](../go.work). Until its first tag exists, a module
    that requires it needs a temporary `replace` (see
    [Pinning an unreleased version](#pinning-an-unreleased-version)).

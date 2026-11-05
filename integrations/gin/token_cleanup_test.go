@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	adminstorage "github.com/shopware/app-sdk-go/clients/adminapi/tokenstorage"
-	ginintegration "github.com/shopware/app-sdk-go/integrations/gin"
-	"github.com/shopware/app-sdk-go/pkg/app"
-	"github.com/shopware/app-sdk-go/pkg/signature"
-	"github.com/shopware/app-sdk-go/pkg/store"
+	"github.com/shopware/sdk-go/app"
+	adminstorage "github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
+	ginintegration "github.com/shopware/sdk-go/integrations/gin"
+	"github.com/shopware/sdk-go/signature"
+	"github.com/shopware/sdk-go/store"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
