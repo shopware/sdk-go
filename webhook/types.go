@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/shopware/sdk-go/sdkerrors"
 )
@@ -70,29 +69,6 @@ type EventHeaders struct {
 	ShopwareShopSignature string
 	ShopwareVersion       string
 	UserAgent             string
-}
-
-// ProcessedEvent represents a webhook event after processing and enrichment
-type ProcessedEvent struct {
-	ID            string                  `json:"id"`
-	EventType     string                  `json:"event_type"`
-	ShopID        string                  `json:"shop_id"`
-	ShopURL       string                  `json:"shop_url"`
-	EntityChanges []ProcessedEntityChange `json:"entity_changes"`
-	Timestamp     time.Time               `json:"timestamp"`
-	IngestedAt    time.Time               `json:"ingested_at"`
-	TraceID       string                  `json:"trace_id"`
-	Version       string                  `json:"version"`
-	Verified      bool                    `json:"verified"`
-}
-
-// ProcessedEntityChange represents an enriched entity change with additional API context
-type ProcessedEntityChange struct {
-	EntityType    string   `json:"entity_type"`
-	EntityID      string   `json:"entity_id"`
-	Operation     string   `json:"operation"`
-	UpdatedFields []string `json:"updated_fields,omitempty"`
-	APIEndpoint   string   `json:"api_endpoint"`
 }
 
 // Validate checks if the event has all required fields
