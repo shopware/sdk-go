@@ -8,9 +8,3 @@ use (
 	./examples/vanilla-service
 	./integrations/gin
 )
-
-replace github.com/shopware/sdk-go v1.0.0 => .
-
-replace github.com/shopware/sdk-go/integrations/gin v1.0.0 => ./integrations/gin
-
-replace github.com/shopware/sdk-go/clients/adminapi v1.0.0 => ./clients/adminapi
