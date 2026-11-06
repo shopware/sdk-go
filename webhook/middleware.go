@@ -49,12 +49,12 @@ type Config struct {
 
 	// DualVerifier adds the previous-secret fallback used during a secret
 	// rotation. When nil, it is derived from Verifier and
-	// InflightAllowanceSeconds.
+	// InflightAllowance.
 	DualVerifier *signature.DualVerifier
 
-	// Grace window for previous-secret signatures; <= 0 uses signature.InflightAllowanceSeconds.
+	// Grace window for previous-secret signatures; <= 0 uses signature.DefaultInflightAllowance.
 	// Only used to derive DualVerifier, so supplying one makes this field inert.
-	InflightAllowanceSeconds int
+	InflightAllowance time.Duration
 
 	// MaxBodyBytes limits the size of incoming request bodies buffered before
 	// authentication, mitigating memory-exhaustion DoS via oversized payloads.
@@ -72,7 +72,7 @@ func (c Config) withDefaults() Config {
 		c.Verifier = signature.NewVerifier()
 	}
 	if c.DualVerifier == nil {
-		c.DualVerifier = signature.NewDualVerifier(c.Verifier, c.InflightAllowanceSeconds)
+		c.DualVerifier = signature.NewDualVerifier(c.Verifier, c.InflightAllowance)
 	}
 	if c.MaxBodyBytes <= 0 {
 		c.MaxBodyBytes = DefaultMaxBodyBytes

@@ -47,8 +47,8 @@ func TestDefaultLifecyclePolicy_IsStrict(t *testing.T) {
 	p := resolver.DefaultLifecyclePolicy()
 
 	assert.Equal(t, resolver.TimestampRequire, p.Timestamp)
-	assert.Equal(t, signature.ReplayWindowSeconds*time.Second, p.MaxAge)
-	assert.Equal(t, signature.ClockSkewSeconds*time.Second, p.ClockSkew)
+	assert.Equal(t, signature.DefaultReplayWindow, p.MaxAge)
+	assert.Equal(t, signature.DefaultClockSkew, p.ClockSkew)
 }
 
 func TestLifecyclePolicy_ZeroValueMatchesDefault(t *testing.T) {

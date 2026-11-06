@@ -22,8 +22,8 @@ func TestFreshnessPolicy_WithDefaults(t *testing.T) {
 		{
 			name:          "zero value gets both SDK defaults",
 			policy:        signature.FreshnessPolicy{},
-			wantMaxAge:    signature.ReplayWindowSeconds * time.Second,
-			wantClockSkew: signature.ClockSkewSeconds * time.Second,
+			wantMaxAge:    signature.DefaultReplayWindow,
+			wantClockSkew: signature.DefaultClockSkew,
 		},
 		{
 			name:          "explicit durations are preserved",
@@ -35,19 +35,19 @@ func TestFreshnessPolicy_WithDefaults(t *testing.T) {
 			name:          "only MaxAge set",
 			policy:        signature.FreshnessPolicy{MaxAge: 42 * time.Second},
 			wantMaxAge:    42 * time.Second,
-			wantClockSkew: signature.ClockSkewSeconds * time.Second,
+			wantClockSkew: signature.DefaultClockSkew,
 		},
 		{
 			name:          "only ClockSkew set",
 			policy:        signature.FreshnessPolicy{ClockSkew: 7 * time.Second},
-			wantMaxAge:    signature.ReplayWindowSeconds * time.Second,
+			wantMaxAge:    signature.DefaultReplayWindow,
 			wantClockSkew: 7 * time.Second,
 		},
 		{
 			name:          "negative durations fall back to the defaults",
 			policy:        signature.FreshnessPolicy{MaxAge: -time.Second, ClockSkew: -time.Second},
-			wantMaxAge:    signature.ReplayWindowSeconds * time.Second,
-			wantClockSkew: signature.ClockSkewSeconds * time.Second,
+			wantMaxAge:    signature.DefaultReplayWindow,
+			wantClockSkew: signature.DefaultClockSkew,
 		},
 	}
 

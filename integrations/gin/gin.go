@@ -94,11 +94,11 @@ type Config struct {
 	// Note: only applied when this integration constructs the App (i.e. App is nil).
 	LifecyclePolicy resolver.LifecyclePolicy
 
-	// InflightAllowanceSeconds is the grace window (in seconds) for accepting
-	// signatures made with the previous secret after a rotation. When 0,
-	// signature.InflightAllowanceSeconds (60) is used.
+	// InflightAllowance is the grace window for accepting signatures made with
+	// the previous secret after a rotation. When <= 0,
+	// signature.DefaultInflightAllowance (1 minute) is used.
 	// Note: only applied when this integration constructs the App (i.e. App is nil).
-	InflightAllowanceSeconds int
+	InflightAllowance time.Duration
 
 	// AllowUnsignedReregistration re-enables a known-vulnerable path; see the field
 	// of the same name on app.Config. Leave false unless you must serve shops on
@@ -195,7 +195,7 @@ func Configure(router *gin.Engine, cfg Config) error {
 			PostPolicy:                  cfg.PostPolicy,
 			WebhookPolicy:               cfg.WebhookPolicy,
 			LifecyclePolicy:             cfg.LifecyclePolicy,
-			InflightAllowanceSeconds:    cfg.InflightAllowanceSeconds,
+			InflightAllowance:           cfg.InflightAllowance,
 			AllowUnsignedReregistration: cfg.AllowUnsignedReregistration,
 		})
 		if err != nil {

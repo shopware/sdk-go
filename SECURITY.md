@@ -93,8 +93,8 @@ and the default:
 | Check | Default |
 | --- | --- |
 | `timestamp` present | Required (`TimestampRequire`) |
-| Maximum age | 5 minutes (`signature.ReplayWindowSeconds`) |
-| Future tolerance | 1 minute (`signature.ClockSkewSeconds`) |
+| Maximum age | 5 minutes (`signature.DefaultReplayWindow`) |
+| Future tolerance | 1 minute (`signature.DefaultClockSkew`) |
 | Inactive shops | Rejected (403 `shop_not_active`) |
 
 Configure it once through `app.Config.QueryPolicy` (or `Config.QueryPolicy` in

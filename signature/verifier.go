@@ -62,7 +62,7 @@ func (v *HMACVerifier) VerifyTimestamp(timestampStr string) error {
 		return ErrMissingTimestamp
 	}
 
-	window := ReplayWindowSeconds * time.Second
+	window := DefaultReplayWindow
 	if err := CheckFreshness(timestampStr, window, window, time.Now()); err != nil {
 		return err
 	}

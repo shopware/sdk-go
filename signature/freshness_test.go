@@ -58,7 +58,7 @@ func TestCheckFreshness(t *testing.T) {
 		},
 
 		// maxAge and skew <= 0 fall back to the SDK defaults, so the accepted
-		// window is ReplayWindowSeconds in the past and ClockSkewSeconds ahead.
+		// window is DefaultReplayWindow in the past and DefaultClockSkew ahead.
 		{name: "zero maxAge falls back to default window", timestamp: at(-4 * time.Minute), maxAge: 0, skew: time.Minute},
 		{
 			name:      "zero maxAge still rejects beyond default window",

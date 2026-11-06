@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"time"
 
 	adminstorage "github.com/shopware/sdk-go/clients/adminapi/tokenstorage"
 	"github.com/shopware/sdk-go/registration"
@@ -69,9 +70,10 @@ type Config struct {
 	// proved knowledge of its secret, so an upgraded shop protects itself again.
 	AllowUnsignedReregistration bool
 
-	// InflightAllowanceSeconds is the grace window (in seconds) for accepting signatures
-	// signed with the previous secret after a secret rotation. Default: 60.
-	InflightAllowanceSeconds int
+	// InflightAllowance is the grace window for accepting signatures made with
+	// the previous secret after a secret rotation. When <= 0,
+	// signature.DefaultInflightAllowance (1 minute) is used.
+	InflightAllowance time.Duration
 
 	// MaxBodyBytes limits the size (in bytes) of incoming request bodies buffered
 	// before authentication. This mitigates memory-exhaustion DoS via oversized
@@ -231,7 +233,7 @@ func New(config Config) (*App, error) {
 	}
 
 	verifier := signature.NewVerifier()
-	dualVerifier := signature.NewDualVerifier(verifier, config.InflightAllowanceSeconds)
+	dualVerifier := signature.NewDualVerifier(verifier, config.InflightAllowance)
 
 	regConfig := registration.Config{
 		AppName:                     config.AppName,
@@ -248,15 +250,15 @@ func New(config Config) (*App, error) {
 		Policy:       config.WebhookPolicy,
 	})
 	ctxResolver := resolver.NewResolver(resolver.Config{
-		ShopStore:                config.ShopStore,
-		WebhookVerifier:          webhookMW,
-		Verifier:                 verifier,
-		DualVerifier:             dualVerifier,
-		InflightAllowanceSeconds: config.InflightAllowanceSeconds,
-		MaxBodyBytes:             config.MaxBodyBytes,
-		QueryPolicy:              config.QueryPolicy,
-		PostPolicy:               config.PostPolicy,
-		LifecyclePolicy:          config.LifecyclePolicy,
+		ShopStore:         config.ShopStore,
+		WebhookVerifier:   webhookMW,
+		Verifier:          verifier,
+		DualVerifier:      dualVerifier,
+		InflightAllowance: config.InflightAllowance,
+		MaxBodyBytes:      config.MaxBodyBytes,
+		QueryPolicy:       config.QueryPolicy,
+		PostPolicy:        config.PostPolicy,
+		LifecyclePolicy:   config.LifecyclePolicy,
 	})
 
 	tokenStorage := config.TokenStorage

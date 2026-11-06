@@ -42,8 +42,8 @@ func TestDefaultQueryPolicy_IsStrict(t *testing.T) {
 	policy := resolver.DefaultQueryPolicy()
 
 	assert.Equal(t, resolver.TimestampRequire, policy.Timestamp)
-	assert.Equal(t, signature.ReplayWindowSeconds*time.Second, policy.MaxAge)
-	assert.Equal(t, signature.ClockSkewSeconds*time.Second, policy.ClockSkew)
+	assert.Equal(t, signature.DefaultReplayWindow, policy.MaxAge)
+	assert.Equal(t, signature.DefaultClockSkew, policy.ClockSkew)
 	assert.False(t, policy.AllowInactiveShop, "inactive shops must be rejected by default")
 }
 
@@ -289,8 +289,8 @@ func TestDefaultPostPolicy_ChecksOnlyWhenPresent(t *testing.T) {
 	// Require would reject every payment, tax provider and gateway request,
 	// because Shopware does not stamp those payloads.
 	assert.Equal(t, resolver.TimestampVerifyIfPresent, policy.Timestamp)
-	assert.Equal(t, signature.ReplayWindowSeconds*time.Second, policy.MaxAge)
-	assert.Equal(t, signature.ClockSkewSeconds*time.Second, policy.ClockSkew)
+	assert.Equal(t, signature.DefaultReplayWindow, policy.MaxAge)
+	assert.Equal(t, signature.DefaultClockSkew, policy.ClockSkew)
 }
 
 func TestPostPolicy_ZeroValueMatchesDefault(t *testing.T) {

@@ -30,7 +30,7 @@ var (
 // Only call this after the signature itself has been verified — an unverified
 // timestamp is attacker-controlled data.
 //
-// maxAge and skew fall back to ReplayWindowSeconds and ClockSkewSeconds when
+// maxAge and skew fall back to DefaultReplayWindow and DefaultClockSkew when
 // they are <= 0. Errors wrap ErrMissingTimestamp, ErrInvalidTimestamp or
 // ErrTimestampOutsideWindow so callers can map them onto their own error types.
 func CheckFreshness(timestampStr string, maxAge, skew time.Duration, now time.Time) error {
@@ -39,10 +39,10 @@ func CheckFreshness(timestampStr string, maxAge, skew time.Duration, now time.Ti
 	}
 
 	if maxAge <= 0 {
-		maxAge = ReplayWindowSeconds * time.Second
+		maxAge = DefaultReplayWindow
 	}
 	if skew <= 0 {
-		skew = ClockSkewSeconds * time.Second
+		skew = DefaultClockSkew
 	}
 
 	seconds, err := strconv.ParseInt(timestampStr, 10, 64)

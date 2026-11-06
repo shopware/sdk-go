@@ -26,19 +26,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newTestResolver(t *testing.T, inflightAllowanceSeconds ...int) (*resolver.Resolver, store.ShopStore) {
+func newTestResolver(t *testing.T, inflightAllowance ...time.Duration) (*resolver.Resolver, store.ShopStore) {
 	t.Helper()
-	allowance := 0
-	if len(inflightAllowanceSeconds) > 0 {
-		allowance = inflightAllowanceSeconds[0]
+	var allowance time.Duration
+	if len(inflightAllowance) > 0 {
+		allowance = inflightAllowance[0]
 	}
 
 	shopStore := store.NewInMemoryStore()
 
 	return resolver.NewResolver(resolver.Config{
-		ShopStore:                shopStore,
-		WebhookVerifier:          webhook.NewMiddleware(webhook.Config{ShopStore: shopStore}),
-		InflightAllowanceSeconds: allowance,
+		ShopStore:         shopStore,
+		WebhookVerifier:   webhook.NewMiddleware(webhook.Config{ShopStore: shopStore}),
+		InflightAllowance: allowance,
 	}), shopStore
 }
 
@@ -254,7 +254,7 @@ func TestResolveFromQuery_FallbackToPreviousSecret_NoPreviousSecret(t *testing.T
 }
 
 func TestResolveFromQuery_CustomAllowance_WithinExtendedWindow(t *testing.T) {
-	r, shopStore := newTestResolver(t, 120)
+	r, shopStore := newTestResolver(t, 2*time.Minute)
 
 	rotatedAt := time.Now().Add(-90 * time.Second)
 	testShop := testutil.NewTestShop()
@@ -270,7 +270,7 @@ func TestResolveFromQuery_CustomAllowance_WithinExtendedWindow(t *testing.T) {
 }
 
 func TestResolveFromQuery_CustomAllowance_OutsideExtendedWindow(t *testing.T) {
-	r, shopStore := newTestResolver(t, 120)
+	r, shopStore := newTestResolver(t, 2*time.Minute)
 
 	rotatedAt := time.Now().Add(-150 * time.Second)
 	testShop := testutil.NewTestShop()

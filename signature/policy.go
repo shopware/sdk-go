@@ -37,22 +37,22 @@ type FreshnessPolicy struct {
 	Mode TimestampMode
 
 	// MaxAge is how long a signed request stays valid.
-	// When <= 0, ReplayWindowSeconds is used.
+	// When <= 0, DefaultReplayWindow is used.
 	MaxAge time.Duration
 
 	// ClockSkew is how far a timestamp may be dated into the future, covering
 	// clock drift between shop and app server.
-	// When <= 0, ClockSkewSeconds is used.
+	// When <= 0, DefaultClockSkew is used.
 	ClockSkew time.Duration
 }
 
 // WithDefaults fills unset durations with the SDK defaults.
 func (p FreshnessPolicy) WithDefaults() FreshnessPolicy {
 	if p.MaxAge <= 0 {
-		p.MaxAge = ReplayWindowSeconds * time.Second
+		p.MaxAge = DefaultReplayWindow
 	}
 	if p.ClockSkew <= 0 {
-		p.ClockSkew = ClockSkewSeconds * time.Second
+		p.ClockSkew = DefaultClockSkew
 	}
 	return p
 }

@@ -449,9 +449,9 @@ shopStore := testutil.NewFailingStore(errors.New("connection refused"))
 When a test file has a repeated setup block (e.g., creating a resolver with store + verifier + middleware), extract a file-level helper that calls `t.Helper()`:
 
 ```go
-func newTestResolver(t *testing.T, inflightAllowance ...int) (*resolver.Resolver, store.ShopStore) {
+func newTestResolver(t *testing.T, inflightAllowance ...time.Duration) (*resolver.Resolver, store.ShopStore) {
     t.Helper()
-    allowance := 0
+    var allowance time.Duration
     if len(inflightAllowance) > 0 {
         allowance = inflightAllowance[0]
     }
@@ -461,7 +461,7 @@ func newTestResolver(t *testing.T, inflightAllowance ...int) (*resolver.Resolver
     return resolver.NewResolver(resolver.Config{
         ShopStore:                shopStore,
         WebhookVerifier:          webhook.NewMiddleware(webhook.Config{ShopStore: shopStore}),
-        InflightAllowanceSeconds: allowance,
+        InflightAllowance: allowance,
     }), shopStore
 }
 ```

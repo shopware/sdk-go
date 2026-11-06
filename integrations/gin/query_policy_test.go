@@ -109,7 +109,7 @@ func TestConfigure_PassesQueryPolicyToApp(t *testing.T) {
 			Timestamp: resolver.TimestampVerifyIfPresent,
 			MaxAge:    42 * time.Second,
 		},
-		InflightAllowanceSeconds: 90,
+		InflightAllowance: 90 * time.Second,
 	}))
 }
 

@@ -311,7 +311,7 @@ func TestVerifyConfirmationDual_InvalidPrimarySignature(t *testing.T) {
 
 func TestVerifyWebhookWithFallback_CustomAllowance_WithinExtendedWindow(t *testing.T) {
 	verifier := signature.NewVerifier()
-	dv := signature.NewDualVerifier(verifier, 120)
+	dv := signature.NewDualVerifier(verifier, 2*time.Minute)
 
 	body := []byte(`{"event":"order.placed"}`)
 	rotatedAt := time.Now().Add(-90 * time.Second)
@@ -329,7 +329,7 @@ func TestVerifyWebhookWithFallback_CustomAllowance_WithinExtendedWindow(t *testi
 
 func TestVerifyWebhookWithFallback_CustomAllowance_OutsideExtendedWindow(t *testing.T) {
 	verifier := signature.NewVerifier()
-	dv := signature.NewDualVerifier(verifier, 120)
+	dv := signature.NewDualVerifier(verifier, 2*time.Minute)
 
 	body := []byte(`{"event":"order.placed"}`)
 	rotatedAt := time.Now().Add(-150 * time.Second)

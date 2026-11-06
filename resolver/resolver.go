@@ -44,12 +44,12 @@ type Config struct {
 
 	// DualVerifier adds the previous-secret fallback used during a secret
 	// rotation. When nil, it is derived from Verifier and
-	// InflightAllowanceSeconds.
+	// InflightAllowance.
 	DualVerifier *signature.DualVerifier
 
-	// Grace window for previous-secret signatures; <= 0 uses signature.InflightAllowanceSeconds.
+	// Grace window for previous-secret signatures; <= 0 uses signature.DefaultInflightAllowance.
 	// Drives the query path directly, separately from DualVerifier — set both or neither.
-	InflightAllowanceSeconds int
+	InflightAllowance time.Duration
 
 	// MaxBodyBytes limits the size of incoming request bodies buffered before
 	// authentication, mitigating memory-exhaustion DoS via oversized payloads.
@@ -75,10 +75,10 @@ func (c Config) withDefaults() Config {
 		c.Verifier = signature.NewVerifier()
 	}
 	if c.DualVerifier == nil {
-		c.DualVerifier = signature.NewDualVerifier(c.Verifier, c.InflightAllowanceSeconds)
+		c.DualVerifier = signature.NewDualVerifier(c.Verifier, c.InflightAllowance)
 	}
-	if c.InflightAllowanceSeconds <= 0 {
-		c.InflightAllowanceSeconds = signature.InflightAllowanceSeconds
+	if c.InflightAllowance <= 0 {
+		c.InflightAllowance = signature.DefaultInflightAllowance
 	}
 	if c.MaxBodyBytes <= 0 {
 		c.MaxBodyBytes = webhook.DefaultMaxBodyBytes
@@ -107,7 +107,7 @@ func NewResolver(cfg Config) *Resolver {
 		verifier:          cfg.Verifier,
 		dualVerifier:      cfg.DualVerifier,
 		webhookVerifier:   cfg.WebhookVerifier,
-		inflightAllowance: time.Duration(cfg.InflightAllowanceSeconds) * time.Second,
+		inflightAllowance: cfg.InflightAllowance,
 		maxBodyBytes:      cfg.MaxBodyBytes,
 		queryPolicy:       cfg.QueryPolicy,
 		postPolicy:        cfg.PostPolicy,

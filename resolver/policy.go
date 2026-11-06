@@ -32,11 +32,11 @@ type QueryPolicy struct {
 	// Default: TimestampRequire.
 	Timestamp TimestampMode
 
-	// When <= 0, signature.ReplayWindowSeconds (5 minutes) is used.
+	// When <= 0, signature.DefaultReplayWindow (5 minutes) is used.
 	MaxAge time.Duration
 
 	// How far a timestamp may be dated into the future.
-	// When <= 0, signature.ClockSkewSeconds (1 minute) is used.
+	// When <= 0, signature.DefaultClockSkew (1 minute) is used.
 	ClockSkew time.Duration
 
 	// Only enable for routes that must work while a shop is deactivated;
@@ -48,8 +48,8 @@ type QueryPolicy struct {
 func DefaultQueryPolicy() QueryPolicy {
 	return QueryPolicy{
 		Timestamp:         TimestampRequire,
-		MaxAge:            signature.ReplayWindowSeconds * time.Second,
-		ClockSkew:         signature.ClockSkewSeconds * time.Second,
+		MaxAge:            signature.DefaultReplayWindow,
+		ClockSkew:         signature.DefaultClockSkew,
 		AllowInactiveShop: false,
 	}
 }
@@ -84,10 +84,10 @@ type PostPolicy struct {
 	// TimestampRequire is honoured when set explicitly.
 	Timestamp TimestampMode
 
-	// When <= 0, signature.ReplayWindowSeconds (5 minutes) is used.
+	// When <= 0, signature.DefaultReplayWindow (5 minutes) is used.
 	MaxAge time.Duration
 
-	// When <= 0, signature.ClockSkewSeconds (1 minute) is used.
+	// When <= 0, signature.DefaultClockSkew (1 minute) is used.
 	ClockSkew time.Duration
 }
 
@@ -95,8 +95,8 @@ type PostPolicy struct {
 func DefaultPostPolicy() PostPolicy {
 	return PostPolicy{
 		Timestamp: TimestampVerifyIfPresent,
-		MaxAge:    signature.ReplayWindowSeconds * time.Second,
-		ClockSkew: signature.ClockSkewSeconds * time.Second,
+		MaxAge:    signature.DefaultReplayWindow,
+		ClockSkew: signature.DefaultClockSkew,
 	}
 }
 
@@ -134,10 +134,10 @@ type LifecyclePolicy struct {
 	// TimestampUnset (the zero value) resolves to TimestampRequire.
 	Timestamp TimestampMode
 
-	// When <= 0, signature.ReplayWindowSeconds (5 minutes) is used.
+	// When <= 0, signature.DefaultReplayWindow (5 minutes) is used.
 	MaxAge time.Duration
 
-	// When <= 0, signature.ClockSkewSeconds (1 minute) is used.
+	// When <= 0, signature.DefaultClockSkew (1 minute) is used.
 	ClockSkew time.Duration
 }
 
@@ -145,8 +145,8 @@ type LifecyclePolicy struct {
 func DefaultLifecyclePolicy() LifecyclePolicy {
 	return LifecyclePolicy{
 		Timestamp: TimestampRequire,
-		MaxAge:    signature.ReplayWindowSeconds * time.Second,
-		ClockSkew: signature.ClockSkewSeconds * time.Second,
+		MaxAge:    signature.DefaultReplayWindow,
+		ClockSkew: signature.DefaultClockSkew,
 	}
 }
 

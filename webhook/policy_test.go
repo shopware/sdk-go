@@ -55,8 +55,8 @@ func TestDefaultPolicy_RequiresTimestamp(t *testing.T) {
 	policy := webhook.DefaultPolicy()
 
 	assert.Equal(t, signature.TimestampRequire, policy.Freshness.Mode)
-	assert.Equal(t, signature.ReplayWindowSeconds*time.Second, policy.Freshness.MaxAge)
-	assert.Equal(t, signature.ClockSkewSeconds*time.Second, policy.Freshness.ClockSkew)
+	assert.Equal(t, signature.DefaultReplayWindow, policy.Freshness.MaxAge)
+	assert.Equal(t, signature.DefaultClockSkew, policy.Freshness.ClockSkew)
 }
 
 func TestPolicy_ZeroValueRequiresTimestamp(t *testing.T) {

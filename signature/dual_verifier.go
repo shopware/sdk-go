@@ -30,18 +30,24 @@ type ShopState struct {
 	HasVerifiedWithDoubleSignature bool
 }
 
+// DualVerifier verifies registration, confirmation and webhook signatures while
+// a shop secret is being rotated, accepting the previous secret for a short
+// grace window.
 type DualVerifier struct {
 	primary           Verifier
 	inflightAllowance time.Duration
 }
 
-func NewDualVerifier(primary Verifier, inflightAllowanceSeconds int) *DualVerifier {
-	if inflightAllowanceSeconds <= 0 {
-		inflightAllowanceSeconds = InflightAllowanceSeconds
+// NewDualVerifier creates a DualVerifier on top of primary. inflightAllowance is
+// how long after a rotation signatures made with the previous secret are still
+// accepted; when <= 0, DefaultInflightAllowance is used.
+func NewDualVerifier(primary Verifier, inflightAllowance time.Duration) *DualVerifier {
+	if inflightAllowance <= 0 {
+		inflightAllowance = DefaultInflightAllowance
 	}
 	return &DualVerifier{
 		primary:           primary,
-		inflightAllowance: time.Duration(inflightAllowanceSeconds) * time.Second,
+		inflightAllowance: inflightAllowance,
 	}
 }
 

@@ -1,10 +1,6 @@
 package webhook
 
-import (
-	"time"
-
-	"github.com/shopware/sdk-go/signature"
-)
+import "github.com/shopware/sdk-go/signature"
 
 // Policy governs the freshness check applied to webhook authentication.
 type Policy struct {
@@ -15,14 +11,14 @@ type Policy struct {
 }
 
 // DefaultPolicy returns the policy applied when none is configured: a timestamp
-// is required, within signature.ReplayWindowSeconds, tolerating
-// signature.ClockSkewSeconds of future skew.
+// is required, within signature.DefaultReplayWindow, tolerating
+// signature.DefaultClockSkew of future skew.
 func DefaultPolicy() Policy {
 	return Policy{
 		Freshness: signature.FreshnessPolicy{
 			Mode:      signature.TimestampRequire,
-			MaxAge:    signature.ReplayWindowSeconds * time.Second,
-			ClockSkew: signature.ClockSkewSeconds * time.Second,
+			MaxAge:    signature.DefaultReplayWindow,
+			ClockSkew: signature.DefaultClockSkew,
 		},
 	}
 }

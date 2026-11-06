@@ -19,7 +19,7 @@
 // timestamp but does not make it expire, so a captured URL would replay forever
 // if nobody compared that timestamp with the current time. QueryPolicy adds
 // those checks, and its zero value is the strictest one — a timestamp is
-// required, signed queries expire after signature.ReplayWindowSeconds, and
+// required, signed queries expire after signature.DefaultReplayWindow, and
 // inactive shops are rejected.
 //
 //	r := resolver.NewResolver(resolver.Config{
