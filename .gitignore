@@ -1,0 +1,111 @@
+# =============================================================================
+# Shopware SDK for Go - Git Ignore Configuration
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Go
+# -----------------------------------------------------------------------------
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Example binaries (built from examples/)
+/vanilla-service
+/gin-service
+/admin-extension
+examples/vanilla-service/vanilla-service
+examples/gin-service/gin-service
+examples/admin-extension/admin-extension
+
+# Build artifacts
+/bin/
+/dist/
+/build/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Devcontainer lock file (if using devcontainers)
+.devcontainer/devcontainer-lock.json
+
+# -----------------------------------------------------------------------------
+# Node.js / Frontend
+# -----------------------------------------------------------------------------
+# Dependencies
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+build/
+.vite/
+.turbo/
+
+# Cache
+.npm/
+.eslintcache
+.cache/
+
+# -----------------------------------------------------------------------------
+# Environment and Secrets
+# -----------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+*.env
+!env.example
+
+# -----------------------------------------------------------------------------
+# Data and Storage
+# -----------------------------------------------------------------------------
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+/data/
+**/data/
+*.db-wal
+*.db-shm
+*.db-journal
+
+# DynamoDB local
+.dynamodb/
+
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+# Don't ignore Dockerfiles, but ignore runtime artifacts
+docker-compose.override.yml
+
+# -----------------------------------------------------------------------------
+# Testing
+# -----------------------------------------------------------------------------
+/coverage/
+*.coverprofile
+/tmp/
+/temp/
+*_coverage.html
+
+# -----------------------------------------------------------------------------
+# OS
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+*~
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

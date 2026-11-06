@@ -1,0 +1,42 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    commit-message:
+      prefix: "chore(deps): "
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "gomod"
+    directories:
+      - "/"                       # core module
+      - "/integrations/gin"       # gin integration module
+      - "/clients/adminapi"       # Admin API client module
+      - "/examples/admin-extension"
+      - "/examples/gin-service"
+      - "/examples/vanilla-service"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    commit-message:
+      prefix: "chore(deps): "
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+    groups:
+      minor-dependencies:
+        update-types:
+          - "minor"
+      patch-dependencies:
+        update-types:
+          - "patch"

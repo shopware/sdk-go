@@ -1,0 +1,80 @@
+# =============================================================================
+# Shopware Admin Extension Example - Docker Compose Configuration
+# =============================================================================
+# This Docker Compose file sets up the complete admin extension example with:
+# - Go backend service (Gin + Shopware SDK)
+# - Vue.js frontend (Vite dev server with HMR)
+# - SQLite database (persisted via Docker volume)
+#
+# Usage:
+#   docker-compose up -d              # Start services
+#   docker-compose logs -f            # View logs
+#   docker-compose down               # Stop services
+#   docker-compose up -d --build      # Rebuild and restart
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Backend Service (Go + Gin + Shopware SDK)
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shopware-admin-extension
+
+    # Port mapping for direct access (optional)
+    ports:
+      - "8085:8080"                    # Host:Container
+    
+    # Environment variables (from .env file)
+    environment:
+      - SHOPWARE_APP_NAME=${SHOPWARE_APP_NAME:-AdminExtensionApp}
+      - SHOPWARE_APP_SECRET=${SHOPWARE_APP_SECRET:-my-super-secret-key-12345}
+      - SHOPWARE_CONFIRMATION_URL=http://host.docker.internal:8085/app/register/confirm
+      - TOKEN_SECRET=${TOKEN_SECRET:-CHANGE-ME-USE-openssl-rand-base64-32-TO-GENERATE}
+      - SERVER_ADDR=:8080              # Internal container port
+      - DATABASE_PATH=/app/data/shops.db
+    
+    # Persistent storage for SQLite database
+    volumes:
+      - admin-data:/app/data           # Persists shop data between restarts
+    
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Frontend Service (Vue.js + Vite Dev Server)
+  # ---------------------------------------------------------------------------
+  frontend:
+    image: node:20-alpine
+    container_name: admin-extension-frontend
+    working_dir: /app
+    
+    # Command installs deps and starts Vite dev server with HMR
+    # --host 0.0.0.0 allows external connections from Shopware/browser contexts
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+    # Port mapping for direct access (optional)
+    ports:
+      - "5173:5173"                    # Host:Container
+    
+    # Mount source code for live reload (HMR)
+    volumes:
+      - ./frontend:/app                # Changes reflect immediately!
+    
+    # Vite environment variables
+    environment:
+      # Backend API URL - frontend calls this for authentication & data
+      - VITE_API_URL=http://host.docker.internal:8085
+    
+    restart: unless-stopped
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  # Persists SQLite database across container restarts
+  # Location: /var/lib/docker/volumes/admin-extension_admin-data/_data
+  # Inspect: docker volume inspect admin-extension_admin-data
+  admin-data:
+    driver: local

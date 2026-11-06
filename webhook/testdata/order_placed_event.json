@@ -1,0 +1,16 @@
+{
+  "source": {
+    "shopId": "test-shop-123",
+    "url": "https://test-shop.com"
+  },
+  "data": {
+    "event": "order.placed",
+    "payload": [
+      {
+        "entity": "order",
+        "operation": "insert",
+        "primaryKey": "order-123"
+      }
+    ]
+  }
+}

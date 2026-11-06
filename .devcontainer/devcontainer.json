@@ -1,0 +1,27 @@
+{
+  "name": "sdk-go (Go 1.26)",
+  "build": { "dockerfile": "Dockerfile" },
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go"
+      ],
+      "settings": {
+        "go.lintTool": "golangci-lint",
+        "go.lintFlags": ["--path-mode=abs", "--fast-only"],
+        "go.testFlags": ["-race", "-v"],
+        "go.toolsManagement.checkForUpdates": "off",
+        "go.useLanguageServer": true,
+        "[go]": {
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": { "source.organizeImports": "explicit" }
+        }
+      }
+    }
+  },
+  "postCreateCommand": "go version && golangci-lint version && go mod download && (cd examples/gin-service && go mod download) && (cd examples/admin-extension && go mod download)",
+  "remoteUser": "vscode"
+}

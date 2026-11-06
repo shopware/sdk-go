@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+=============================================================================
+Shopware Admin Extension Example - Manifest Configuration
+=============================================================================
+This manifest defines the Shopware app configuration for the admin extension.
+
+IMPORTANT NOTES:
+1. The <secret> must match SHOPWARE_APP_SECRET in .env
+2. URLs are configured for Docker-based local development with host.docker.internal
+3. For production, update all local URLs to your production HTTPS domain
+4. The sidebar entry is registered dynamically by the frontend (main.ts)
+   using Meteor Admin SDK's ui.sidebar.add() method
+
+Structure:
+- <meta>: App metadata (name, version, compatibility)
+- <setup>: Registration endpoint and secret
+- <admin>: Frontend URL (iframe base URL)
+- <webhooks>: Lifecycle and business event handlers
+- <permissions>: Required API access permissions
+=============================================================================
+-->
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
+    
+    <!-- ====================================================================
+         App Metadata
+         ==================================================================== -->
+    <meta>
+        <!-- Technical name (must match SHOPWARE_APP_NAME in .env) -->
+        <name>AdminExtensionApp</name>
+        
+        <!-- Display name in Shopware admin -->
+        <label>Admin Extension Example</label>
+        <label lang="de-DE">Admin Extension Beispiel</label>
+        
+        <!-- Description shown in app store -->
+        <description>Example app demonstrating admin UI extension with Vue.js frontend and Go backend</description>
+        <description lang="de-DE">Beispiel-App zur Demonstration der Admin-UI-Erweiterung mit Vue.js Frontend und Go Backend</description>
+        
+        <author>Shopware SDK Team</author>
+        <copyright>(c) by Shopware AG</copyright>
+        
+        <!-- Increment on each change for proper update handling -->
+        <version>1.0.5</version>
+        
+        <!-- Shopware versions covered by the SDK compatibility policy -->
+        <compatibility>&gt;=6.6.0.0 &lt;6.8.0.0</compatibility>
+        
+        <license>MIT</license>
+    </meta>
+
+    <!-- ====================================================================
+         Registration Setup
+         ==================================================================== -->
+    <setup>
+        <!-- Registration endpoint - where Shopware initiates app installation
+             - GET request with shop-id, shop-url, timestamp, signature
+             - Backend responds with proof and confirmationUrl
+             - For local dev: Uses host.docker.internal and the backend host port
+             - For production: Update to your production domain -->
+        <registrationUrl>http://host.docker.internal:8085/app/register</registrationUrl>
+        
+        <!-- App secret for signature verification during registration
+             SECURITY CRITICAL:
+             - Must match SHOPWARE_APP_SECRET in .env
+             - Used to verify HMAC-SHA256 signature from Shopware
+             - Keep this secret! Don't commit real secrets to git
+             - For production: Use a strong random value (32+ chars) -->
+        <secret>my-super-secret-key-12345</secret>
+    </setup>
+
+    <!-- ====================================================================
+         Admin UI Configuration
+         ==================================================================== -->
+    <admin>
+        <!-- Base URL for admin extension frontend
+             - Shopware loads this URL in an iframe
+             - Frontend uses Meteor Admin SDK for integration
+             - For local dev: Vite dev server exposed on host port 5173
+             - For production: Your production frontend URL
+             
+             IMPORTANT: Sidebar entry is NOT defined here!
+             The frontend dynamically registers the sidebar entry in main.ts:
+             
+             ui.sidebar.add({
+               title: 'Extension Demo',
+               locationId: 'admin-extension-demo',
+               icon: 'solid-puzzle',
+             })
+             
+             This approach provides more flexibility and follows modern
+             Shopware app development practices. -->
+        <base-app-url>http://host.docker.internal:5173/</base-app-url>
+    </admin>
+
+    <!-- ====================================================================
+         Webhook Configuration
+         ==================================================================== -->
+    <webhooks>
+        <!-- Lifecycle Webhooks (Required for proper app lifecycle) -->
+        
+        <!-- Called when app is activated by merchant
+             - POST request to backend
+             - Contains shop credentials (apiKey, secretKey)
+             - Backend updates shop status to active -->
+        <webhook name="appActivate"
+                 url="http://host.docker.internal:8085/app/activate"
+                 event="app.activated"/>
+        
+        <!-- Called when app is deactivated by merchant
+             - POST request to backend
+             - Backend updates shop status to inactive
+             - Frontend will no longer work until reactivated -->
+        <webhook name="appDeactivate"
+                 url="http://host.docker.internal:8085/app/deactivate"
+                 event="app.deactivated"/>
+        
+        <!-- Called when app is deleted by merchant
+             - POST request to backend
+             - Backend deletes shop from database
+             - All shop data is cleaned up -->
+        <webhook name="appDelete"
+                 url="http://host.docker.internal:8085/app/delete"
+                 event="app.deleted"/>
+        
+        <!-- Business Event Webhooks (Optional - examples) -->
+        
+        <!-- Called when an order is placed
+             - POST request with order data
+             - Can be used for order processing, notifications, etc. -->
+        <webhook name="orderPlaced"
+                 url="http://host.docker.internal:8085/app/webhook/order-placed"
+                 event="order.placed"/>
+        
+        <!-- Called when a product is created or updated
+             - POST request with product data
+             - Can be used for inventory sync, price updates, etc. -->
+        <webhook name="productWritten"
+                 url="http://host.docker.internal:8085/app/webhook/product-written"
+                 event="product.written"/>
+        
+        <!-- Add more webhooks as needed:
+             - customer.written (customer created/updated)
+             - order.state_enter.* (order state changes)
+             - product.deleted (product deleted)
+             See: https://developer.shopware.com/docs/resources/references/core-reference/events-reference -->
+    </webhooks>
+
+    <!-- ====================================================================
+         API Permissions
+         ==================================================================== -->
+    <permissions>
+        <!-- Read permissions for API access
+             These permissions allow the app to read data from Shopware API
+             via the Admin API client (sdk.NewClient)
+             
+             IMPORTANT: Only request permissions you actually need!
+             Merchants can see these in the app installation dialog. -->
+        
+        <!-- Read order data (for dashboard stats, order processing) -->
+        <read>order</read>
+        
+        <!-- Read product data (for inventory, pricing) -->
+        <read>product</read>
+        
+        <!-- Read customer data (for CRM, support) -->
+        <read>customer</read>
+        
+        <!-- Read system configuration (for app settings) -->
+        <read>system_config</read>
+        
+        <!-- Read user data (for authentication, permissions) -->
+        <read>user</read>
+        
+        <!-- Add more permissions as needed:
+             <read>category</read>
+             <read>media</read>
+             <write>product</write>
+             <delete>order</delete>
+             
+             See: https://developer.shopware.com/docs/guides/plugins/apps/app-base-guide#permissions -->
+    </permissions>
+    
+    <!-- Additional sections you might need for more advanced apps:
+    
+    <modules>
+        <!- - Define custom admin modules (alternative to dynamic sidebar) - ->
+        <module name="my-module" parent="sw-catalogue" position="50">
+            <label>My Module</label>
+            <source>https://frontend.example.com/module</source>
+        </module>
+    </modules>
+    
+    <action-buttons>
+        <!- - Add action buttons to entity detail pages - ->
+        <action-button action="viewDetails" entity="order" view="detail" url="...">
+            <label>View Details</label>
+        </action-button>
+    </action-buttons>
+    
+    <payments>
+        <!- - Define payment methods - ->
+        <payment-method>
+            <identifier>my-payment</identifier>
+            <name>My Payment</name>
+            <pay-url>https://backend.example.com/payment/pay</pay-url>
+        </payment-method>
+    </payments>
+    
+    -->
+</manifest>

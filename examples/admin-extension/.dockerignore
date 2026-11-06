@@ -1,0 +1,7 @@
+# The backend image needs only the Go sources; the frontend has its own service
+frontend/
+data/
+*.db
+*.db-*
+.env
+*.md

@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shopware-gin-service
+    ports:
+      - "8084:8080"  # External:Internal
+    environment:
+      - SHOPWARE_APP_NAME=GinShopwareApp
+      - SHOPWARE_APP_SECRET=${SHOPWARE_APP_SECRET:-my-super-secret-key-12345}
+      - SHOPWARE_CONFIRMATION_URL=http://host.docker.internal:8084/app/register/confirm
+      - SERVER_ADDR=:8080
+      - ENVIRONMENT=development
+      - STORE_TYPE=sqlite
+      - DATABASE_PATH=/app/data/shops.db
+      # Admin API tokens are shared through Valkey (Redis-compatible), so
+      # several app instances reuse one token per shop.
+      - TOKEN_STORAGE=redis
+      - REDIS_ADDR=valkey:6379
+      - TOKEN_KEY_PREFIX=gin-service:token:
+      # Optional: encrypt tokens at rest (base64 of 32 bytes, `openssl rand -base64 32`)
+      - TOKEN_ENCRYPTION_KEY=${TOKEN_ENCRYPTION_KEY:-}
+    depends_on:
+      valkey:
+        condition: service_healthy
+    # Shopware running in Docker can reach this service through the host port:
+    # http://host.docker.internal:8084
+    volumes:
+      - shop-data:/app/data  # Persistent SQLite database
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # Token storage for the Admin API client. Valkey speaks the Redis protocol,
+  # so the go-redis client works unchanged; image: redis:7 works as well.
+  valkey:
+    image: valkey/valkey:8
+    container_name: shopware-gin-service-valkey
+    volumes:
+      - valkey-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Uncomment to use DynamoDB local for testing
+  # dynamodb-local:
+  #   image: amazon/dynamodb-local:latest
+  #   container_name: dynamodb-local
+  #   ports:
+  #     - "8000:8000"
+  #   command: "-jar DynamoDBLocal.jar -sharedDb"
+  #   volumes:
+  #     - dynamodb-data:/home/dynamodblocal/data
+  #   restart: unless-stopped
+  #   # Access from app service: http://dynamodb-local:8000
+  #   # Access from host: http://localhost:8000
+
+  # Uncomment to add monitoring with Prometheus
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   restart: unless-stopped
+
+# Note: For local development, manually connect containers to shopware_default network:
+# docker network connect shopware_default shopware-gin-service
+
+volumes:
+  shop-data:
+    driver: local
+  valkey-data:
+    driver: local
+  # dynamodb-data:  # Uncomment if using DynamoDB Local
+  #   driver: local

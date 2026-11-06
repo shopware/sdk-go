@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/Framework/App/Manifest/Schema/manifest-1.0.xsd">
+    <meta>
+        <name>VanillaShopwareApp</name>
+        <label>Vanilla Shopware App Example</label>
+        <label lang="de-DE">Vanilla Shopware App Beispiel</label>
+        <description>Basic Shopware app example using manual SDK setup with net/http</description>
+        <description lang="de-DE">Basis Shopware-App-Beispiel mit manuellem SDK-Setup und net/http</description>
+        <author>Shopware</author>
+        <copyright>(c) 2025 Shopware AG</copyright>
+        <version>1.0.0</version>
+        <compatibility>&gt;=6.6.0.0 &lt;6.8.0.0</compatibility>
+        <license>MIT</license>
+    </meta>
+
+    <setup>
+        <!-- 
+            IMPORTANT: Update these values before deploying!
+            - registrationUrl: Must point to your deployed app's /register endpoint
+            - secret: Must match SHOPWARE_APP_SECRET environment variable
+        -->
+        <registrationUrl>http://localhost:3000/register</registrationUrl>
+        <secret>your-app-secret-change-this-in-production</secret>
+    </setup>
+
+    <permissions>
+        <!-- Read permissions for entities -->
+        <read>product</read>
+        <read>order</read>
+        <read>customer</read>
+        <read>media</read>
+    </permissions>
+
+    <webhooks>
+        <!-- 
+            All webhooks point to the same /webhook endpoint.
+            The event type is included in the webhook payload.
+        -->
+        
+        <!-- App lifecycle webhooks -->
+        <webhook name="app-activated" url="http://localhost:3000/webhook" event="app.activated"/>
+        <webhook name="app-deactivated" url="http://localhost:3000/webhook" event="app.deactivated"/>
+        <webhook name="app-deleted" url="http://localhost:3000/webhook" event="app.deleted"/>
+        
+        <!-- Product webhooks -->
+        <webhook name="product-written" url="http://localhost:3000/webhook" event="product.written"/>
+        
+        <!-- Order webhooks -->
+        <webhook name="order-placed" url="http://localhost:3000/webhook" event="order.placed"/>
+
+        <!--- Media webhooks -->
+        <webhook name="media-written" url="http://localhost:3000/webhook" event="media.written"/>
+
+    </webhooks>
+</manifest>

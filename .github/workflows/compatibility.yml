@@ -1,0 +1,46 @@
+name: Compatibility
+
+# Broad portability sweep: build and test every module that has tests across the
+# operating systems, architectures and Go versions we support.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    name: ${{ matrix.os }} / go ${{ matrix.go }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Native GitHub-hosted runners:
+        #   ubuntu-latest    -> linux/amd64
+        #   ubuntu-24.04-arm -> linux/arm64
+        #   windows-latest   -> windows/amd64
+        #   macos-latest     -> darwin/arm64
+        os: [ ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest ]
+        # Minor only + check-latest: setup-go always resolves the latest patch
+        # of each minor from the go-versions manifest instead of the runner's
+        # preinstalled one, so stdlib security fixes are always picked up.
+        go: [ '1.26', '1.27' ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+          check-latest: true
+          cache: true
+
+      - name: Build & test all modules
+        # Run the shared script directly under bash (git-bash on Windows) so no
+        # `make` is required on the runner — same steps as `make ci-test` locally.
+        shell: bash
+        run: bash .github/scripts/ci.sh all

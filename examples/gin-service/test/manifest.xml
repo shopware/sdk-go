@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/Framework/App/Manifest/Schema/manifest-1.0.xsd">
+    <meta>
+        <name>GinShopwareApp</name>
+        <label>Gin Shopware App Example</label>
+        <label lang="de-DE">Gin Shopware App Beispiel</label>
+        <description>Example Shopware app built with Gin web framework and the Go SDK.</description>
+        <description lang="de-DE">Beispiel Shopware-App erstellt mit Gin Webframework und dem Go SDK</description>
+        <author>Shopware</author>
+        <copyright>(c) 2025 Shopware AG</copyright>
+        <version>1.0.0</version>
+        <compatibility>&gt;=6.6.0.0 &lt;6.8.0.0</compatibility>
+        <license>MIT</license>
+    </meta>
+
+    <setup>
+        <!-- 
+            IMPORTANT: Update these values before deploying!
+            - registrationUrl: Must point to your deployed app's /app/register endpoint
+            - secret: Must match SHOPWARE_APP_SECRET environment variable .
+        -->
+        <registrationUrl>http://host.docker.internal:8084/app/register</registrationUrl>
+        <secret>my-super-secret-key-12345</secret>
+        <!-- 
+            For Docker-based local development, host.docker.internal points
+            from the Shopware container to services exposed on the host.
+        -->
+    </setup>
+
+    <permissions>
+        <!-- Read permissions for common entities -->
+        <read>product</read>
+        <read>order</read>
+        <read>customer</read>
+        <read>category</read>
+        <read>media</read>
+        
+        <!-- Uncomment write permissions as needed -->
+        <!-- <create>product</create> -->
+        <!-- <update>product</update> -->
+        <!-- <delete>product</delete> -->
+    </permissions>
+
+    <webhooks>
+        <!-- 
+            All webhooks point to the same /webhook endpoint.
+            The event type is included in the webhook payload.
+        -->
+        
+        <!-- App lifecycle webhooks (handled by Gin integration) -->
+        <webhook name="app-activated" url="http://host.docker.internal:8084/app/activate" event="app.activated"/>
+        <webhook name="app-deactivated" url="http://host.docker.internal:8084/app/deactivate" event="app.deactivated"/>
+        <webhook name="app-deleted" url="http://host.docker.internal:8084/app/delete" event="app.deleted"/>
+        
+        <!-- Product webhooks (custom handler) -->
+        <webhook name="product-written" url="http://host.docker.internal:8084/app/webhook/product" event="product.written"/>
+        <webhook name="product-deleted" url="http://host.docker.internal:8084/app/webhook/product" event="product.deleted"/>
+        
+        <!-- Order webhooks (generic handler) -->
+        <webhook name="order-placed" url="http://host.docker.internal:8084/app/webhook" event="order.placed"/>
+        <webhook name="order-state-changed" url="http://host.docker.internal:8084/app/webhook" event="state_enter.order.state.completed"/>
+        
+        
+        <!-- Add more webhooks as needed -->
+        <!-- See: https://developer.shopware.com/docs/guides/plugins/apps/starter/product-translator.html#webhooks -->
+    </webhooks>
+
+    <!-- 
+        ACTION BUTTONS: Add custom buttons in the Shopware admin UI
+        Uncomment and modify to add action buttons for your app
+    -->
+    <!--
+    <admin>
+        <action-button action="exportProduct" entity="product" view="detail" url="http://host.docker.internal:8084/action-button/export">
+            <label>Export Product</label>
+            <label lang="de-DE">Produkt exportieren</label>
+        </action-button>
+        
+        <action-button action="syncProducts" entity="product" view="list" url="http://host.docker.internal:8084/action-button/sync">
+            <label>Sync All Products</label>
+            <label lang="de-DE">Alle Produkte synchronisieren</label>
+        </action-button>
+        
+        <action-button action="viewAnalytics" entity="order" view="detail" url="http://host.docker.internal:8084/action-button/analytics">
+            <label>View Analytics</label>
+            <label lang="de-DE">Analysen anzeigen</label>
+        </action-button>
+    </admin>
+    -->
+
+    <!-- 
+        MODULES: Add custom pages/iframes in the Shopware admin
+        Uncomment and modify to add custom admin modules
+    -->
+    <!--
+    <admin>
+        <module name="analytics" source="http://host.docker.internal:8084/module/analytics">
+            <label>Analytics Dashboard</label>
+            <label lang="de-DE">Analyse-Dashboard</label>
+        </module>
+        
+        <module name="settings" parent="sw-settings" source="http://host.docker.internal:8084/module/settings">
+            <label>App Settings</label>
+            <label lang="de-DE">App-Einstellungen</label>
+        </module>
+    </admin>
+    -->
+</manifest>
