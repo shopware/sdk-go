@@ -43,7 +43,7 @@ func main() {
 	config := loadConfig(appLogger)
 
 	// Initialize shop store
-	shopStore, err := initializeStore(config, appLogger)
+	shopStore, err := initializeStore(context.Background(), config, appLogger)
 	if err != nil {
 		fatal(appLogger, "Failed to initialize store", slog.Any(keyError, err))
 	}
@@ -171,7 +171,7 @@ func loadConfig(logger *slog.Logger) Config {
 	return config
 }
 
-func initializeStore(config Config, logger *slog.Logger) (store.ShopStore, error) {
+func initializeStore(ctx context.Context, config Config, logger *slog.Logger) (store.ShopStore, error) {
 	switch config.StoreType {
 	case "sqlite":
 		logger.Info("Using SQLite store", slog.String("database_path", config.DatabasePath))
@@ -183,7 +183,7 @@ func initializeStore(config Config, logger *slog.Logger) (store.ShopStore, error
 			slog.String("table", config.DynamoDBTable),
 			slog.String("region", config.DynamoDBRegion),
 		)
-		return store.NewDynamoDBStore(store.DynamoDBConfig{
+		return store.NewDynamoDBStore(ctx, store.DynamoDBConfig{
 			TableName: config.DynamoDBTable,
 			Region:    config.DynamoDBRegion,
 			Endpoint:  config.DynamoDBEndpoint,

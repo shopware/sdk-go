@@ -231,7 +231,7 @@ For production, make these changes:
 1. **Use DynamoDB or SQLite Store:**
 ```go
 // DynamoDB (recommended for production)
-shopStore, err := store.NewDynamoDBStore(store.DynamoDBConfig{
+shopStore, err := store.NewDynamoDBStore(ctx, store.DynamoDBConfig{
     TableName: "shopware-shops",
     Region:    "us-east-1",
 })
@@ -267,7 +267,7 @@ http.ListenAndServeTLS(":443", "cert.pem", "key.pem", nil)
 ```go
 import "github.com/shopware/sdk-go/store/middleware"
 
-baseStore, _ := store.NewDynamoDBStore(store.DynamoDBConfig{...})
+baseStore, _ := store.NewDynamoDBStore(ctx, store.DynamoDBConfig{...})
 shopStore := middleware.NewRetryMiddleware(baseStore, middleware.RetryConfig{
     MaxRetries: 3,
     BaseDelay:  100 * time.Millisecond,

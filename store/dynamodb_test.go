@@ -123,7 +123,7 @@ func TestNewDynamoDBStore_DefaultEndpoint(t *testing.T) {
 		Region:    "us-east-1",
 	}
 
-	dynStore, err := store.NewDynamoDBStore(config)
+	dynStore, err := store.NewDynamoDBStore(t.Context(), config)
 
 	// The function will either succeed (if AWS credentials are available)
 	// or fail with a specific error (if credentials are not available)
@@ -150,7 +150,7 @@ func TestNewDynamoDBStore_CustomEndpoint(t *testing.T) {
 		Endpoint:  "http://localhost:8000",
 	}
 
-	dynStore, err := store.NewDynamoDBStore(config)
+	dynStore, err := store.NewDynamoDBStore(t.Context(), config)
 
 	// The function will either succeed (if AWS credentials are available)
 	// or fail with a specific error (if credentials are not available)

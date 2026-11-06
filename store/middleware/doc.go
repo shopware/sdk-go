@@ -9,7 +9,7 @@
 // for transient errors. It can wrap any ShopStore implementation:
 //
 //	// Create your base store
-//	baseStore, err := store.NewDynamoDBStore(store.DynamoDBConfig{
+//	baseStore, err := store.NewDynamoDBStore(ctx, store.DynamoDBConfig{
 //	    TableName: "shops",
 //	    Region:    "us-east-1",
 //	})

@@ -113,7 +113,7 @@ defer sqliteStore.Close()
 ### DynamoDB Store (Production)
 
 ```go
-dynamoStore, err := store.NewDynamoDBStore(store.DynamoDBConfig{
+dynamoStore, err := store.NewDynamoDBStore(ctx, store.DynamoDBConfig{
     TableName: "shopware-shops",
     Region:    "us-east-1",
 })
@@ -166,7 +166,7 @@ import (
 )
 
 // Create base store
-baseStore, _ := store.NewDynamoDBStore(store.DynamoDBConfig{
+baseStore, _ := store.NewDynamoDBStore(ctx, store.DynamoDBConfig{
     TableName: "shops",
     Region:    "us-east-1",
 })

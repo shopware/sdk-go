@@ -58,7 +58,7 @@
 //	    // MaxDelay:       20 * time.Second,
 //	    // RequestTimeout: 30 * time.Second,
 //	}
-//	dynamoStore, err := store.NewDynamoDBStore(config, logger)
+//	dynamoStore, err := store.NewDynamoDBStore(ctx, config)
 //	if err != nil {
 //	    log.Fatal(err)
 //	}

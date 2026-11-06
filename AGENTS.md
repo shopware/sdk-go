@@ -105,7 +105,7 @@ Store retry logic is NOT built-in. Users can wrap any store with retry middlewar
 ```go
 import "github.com/shopware/sdk-go/store/middleware"
 
-baseStore, _ := store.NewDynamoDBStore(store.DynamoDBConfig{...})
+baseStore, _ := store.NewDynamoDBStore(ctx, store.DynamoDBConfig{...})
 storeWithRetry := middleware.NewRetryMiddleware(baseStore, middleware.RetryConfig{
     MaxRetries: 3,
     BaseDelay:  100 * time.Millisecond,

@@ -82,8 +82,10 @@ type dynamoDBShop struct {
 	UpdatedAt                      string `dynamodbav:"updated_at"`
 }
 
-func NewDynamoDBStore(cfg DynamoDBConfig) (ShopStore, error) {
-	awsCfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(cfg.Region))
+// NewDynamoDBStore creates a DynamoDB store from the default AWS configuration
+// (environment, shared config files, instance or container credentials).
+func NewDynamoDBStore(ctx context.Context, cfg DynamoDBConfig) (ShopStore, error) {
+	awsCfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(cfg.Region))
 	if err != nil {
 		return nil, fmt.Errorf("failed to load AWS config: %w", err)
 	}
