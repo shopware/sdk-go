@@ -28,10 +28,15 @@ type SQLDB interface {
 	Close() error
 }
 
+// SQLiteStore is a ShopStore backed by a SQLite database. Call Close when done.
 type SQLiteStore struct {
 	db SQLDB
 }
 
+var _ ShopStore = (*SQLiteStore)(nil)
+
+// NewSQLiteStore opens (or creates) the SQLite database at config.DatabasePath,
+// defaulting to ./data/shops.db, and creates the schema if needed.
 func NewSQLiteStore(config SQLiteConfig) (*SQLiteStore, error) {
 	if config.DatabasePath == "" {
 		config.DatabasePath = "./data/shops.db"

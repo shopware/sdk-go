@@ -13,8 +13,10 @@ type InMemoryStore struct {
 	mu    sync.RWMutex
 }
 
+var _ ShopStore = (*InMemoryStore)(nil)
+
 // NewInMemoryStore creates a new in-memory shop store
-func NewInMemoryStore() ShopStore {
+func NewInMemoryStore() *InMemoryStore {
 	return &InMemoryStore{
 		shops: make(map[string]*Shop),
 	}

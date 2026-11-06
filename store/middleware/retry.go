@@ -50,8 +50,10 @@ type RetryMiddleware struct {
 	requestTimeout time.Duration
 }
 
+var _ store.ShopStore = (*RetryMiddleware)(nil)
+
 // NewRetryMiddleware creates a new retry middleware that wraps the given store
-func NewRetryMiddleware(s store.ShopStore, cfg RetryConfig) store.ShopStore {
+func NewRetryMiddleware(s store.ShopStore, cfg RetryConfig) *RetryMiddleware {
 	// Apply defaults
 	maxRetries := cfg.MaxRetries
 	if maxRetries == 0 {

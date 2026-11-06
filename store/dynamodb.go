@@ -60,6 +60,7 @@ type DynamoDBAPI interface {
 	) (*dynamodb.DescribeTableOutput, error)
 }
 
+// DynamoDBStore is a ShopStore backed by an Amazon DynamoDB table.
 type DynamoDBStore struct {
 	client    DynamoDBAPI
 	tableName string
@@ -82,9 +83,11 @@ type dynamoDBShop struct {
 	UpdatedAt                      string `dynamodbav:"updated_at"`
 }
 
+var _ ShopStore = (*DynamoDBStore)(nil)
+
 // NewDynamoDBStore creates a DynamoDB store from the default AWS configuration
 // (environment, shared config files, instance or container credentials).
-func NewDynamoDBStore(ctx context.Context, cfg DynamoDBConfig) (ShopStore, error) {
+func NewDynamoDBStore(ctx context.Context, cfg DynamoDBConfig) (*DynamoDBStore, error) {
 	awsCfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(cfg.Region))
 	if err != nil {
 		return nil, fmt.Errorf("failed to load AWS config: %w", err)
@@ -102,8 +105,8 @@ func NewDynamoDBStore(ctx context.Context, cfg DynamoDBConfig) (ShopStore, error
 	return NewDynamoDBStoreWithClient(client, cfg), nil
 }
 
-// NewDynamoDBStoreWithClient creates a DynamoDBStore with a custom client
-func NewDynamoDBStoreWithClient(client DynamoDBAPI, cfg DynamoDBConfig) ShopStore {
+// NewDynamoDBStoreWithClient creates a DynamoDBStore that uses the given client.
+func NewDynamoDBStoreWithClient(client DynamoDBAPI, cfg DynamoDBConfig) *DynamoDBStore {
 	return &DynamoDBStore{
 		client:    client,
 		tableName: cfg.TableName,

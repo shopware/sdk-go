@@ -175,19 +175,29 @@ func initializeStore(ctx context.Context, config Config, logger *slog.Logger) (s
 	switch config.StoreType {
 	case "sqlite":
 		logger.Info("Using SQLite store", slog.String("database_path", config.DatabasePath))
-		return store.NewSQLiteStore(store.SQLiteConfig{
+		sqliteStore, err := store.NewSQLiteStore(store.SQLiteConfig{
 			DatabasePath: config.DatabasePath,
 		})
+		if err != nil {
+			return nil, err
+		}
+
+		return sqliteStore, nil
 	case "dynamodb":
 		logger.Info("Using DynamoDB store",
 			slog.String("table", config.DynamoDBTable),
 			slog.String("region", config.DynamoDBRegion),
 		)
-		return store.NewDynamoDBStore(ctx, store.DynamoDBConfig{
+		dynamoStore, err := store.NewDynamoDBStore(ctx, store.DynamoDBConfig{
 			TableName: config.DynamoDBTable,
 			Region:    config.DynamoDBRegion,
 			Endpoint:  config.DynamoDBEndpoint,
 		})
+		if err != nil {
+			return nil, err
+		}
+
+		return dynamoStore, nil
 	case "memory":
 		logger.Warn("Using in-memory store (not recommended - data will be lost on restart)")
 		return store.NewInMemoryStore(), nil
