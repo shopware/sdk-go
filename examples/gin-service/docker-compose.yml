@@ -20,7 +20,7 @@ services:
       # several app instances reuse one token per shop.
       - TOKEN_STORAGE=redis
       - REDIS_ADDR=valkey:6379
-      - TOKEN_KEY_PREFIX=gin-service:token:
+      - "TOKEN_KEY_PREFIX=gin-service:token:"
       # Optional: encrypt tokens at rest (base64 of 32 bytes, `openssl rand -base64 32`)
       - TOKEN_ENCRYPTION_KEY=${TOKEN_ENCRYPTION_KEY:-}
     depends_on:
