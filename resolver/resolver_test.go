@@ -419,6 +419,7 @@ func TestResolveFromPost_ShopNotFound(t *testing.T) {
 	require.Error(t, err)
 	assert.Nil(t, shop)
 	require.ErrorIs(t, err, sdkerrors.ErrShopNotFound)
+	require.ErrorIs(t, err, store.ErrShopNotFound, "both sentinel names must match")
 	sdkErr := testutil.AssertSDKError(t, err, sdkerrors.TypeShopNotFound)
 	assert.Contains(t, sdkErr.Message, "missing-shop")
 }

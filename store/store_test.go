@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/shopware/sdk-go/internal/testutil"
+	"github.com/shopware/sdk-go/sdkerrors"
 	"github.com/shopware/sdk-go/store"
 	"github.com/stretchr/testify/suite"
 )
@@ -88,14 +89,22 @@ func (s *StoreTestSuite) TestGetShop_Success() {
 	s.Equal(shop.ShopID, retrieved.ShopID)
 }
 
+// assertShopNotFound checks that err matches both names of the not-found
+// sentinel, so callers may use either store.ErrShopNotFound or
+// sdkerrors.ErrShopNotFound.
+func (s *StoreTestSuite) assertShopNotFound(err error) {
+	s.Require().Error(err)
+	s.Require().ErrorIs(err, store.ErrShopNotFound)
+	s.Require().ErrorIs(err, sdkerrors.ErrShopNotFound)
+}
+
 // TestGetShop_NotFound tests retrieving a non-existent shop
 func (s *StoreTestSuite) TestGetShop_NotFound() {
 	ctx := context.Background()
 
 	retrieved, err := s.store.GetShopByID(ctx, "non-existent-shop")
-	s.Require().Error(err)
+	s.assertShopNotFound(err)
 	s.Nil(retrieved)
-	s.Contains(err.Error(), "not found")
 }
 
 // TestGetShop_EmptyShopID tests retrieving with empty shop ID
@@ -130,8 +139,7 @@ func (s *StoreTestSuite) TestSetShopActive_NotFound() {
 	ctx := context.Background()
 
 	err := s.store.SetShopActive(ctx, "non-existent-shop", true)
-	s.Require().Error(err)
-	s.Contains(err.Error(), "not found")
+	s.assertShopNotFound(err)
 }
 
 // TestDeleteShop_Success tests deleting a shop
@@ -157,8 +165,7 @@ func (s *StoreTestSuite) TestDeleteShop_NotFound() {
 	ctx := context.Background()
 
 	err := s.store.DeleteShop(ctx, "non-existent-shop")
-	s.Require().Error(err)
-	s.Contains(err.Error(), "not found")
+	s.assertShopNotFound(err)
 }
 
 // TestHealthCheck_Success tests health check

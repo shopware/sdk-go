@@ -93,14 +93,16 @@
 //	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 //	defer cancel()
 //
-//	shop, err := store.GetShop(ctx, "shop-id")
+//	shop, err := shopStore.GetShopByID(ctx, "shop-id")
 //
 // # Error Handling
 //
-// Stores return standard errors from the errors package:
+// When a shop does not exist, GetShopByID, SetShopActive and DeleteShop return
+// an error wrapping ErrShopNotFound. ErrShopNotFound and
+// sdkerrors.ErrShopNotFound are the same value, so either name works:
 //
-//	shop, err := store.GetShop(ctx, "shop-id")
-//	if errors.Is(err, sdkerrors.ErrShopNotFound) {
+//	shop, err := shopStore.GetShopByID(ctx, "shop-id")
+//	if errors.Is(err, store.ErrShopNotFound) {
 //	    // Handle not found
 //	}
 //
@@ -112,10 +114,11 @@
 //	    client *redis.Client
 //	}
 //
-//	func (r *RedisStore) GetShop(ctx context.Context, shopID string) (*store.Shop, error) {
-//	    // your implementation
+//	func (r *RedisStore) GetShopByID(ctx context.Context, shopID string) (*store.Shop, error) {
+//	    // Return an error wrapping store.ErrShopNotFound when the shop does not exist:
+//	    //     return nil, fmt.Errorf("%w: %s", store.ErrShopNotFound, shopID)
 //	}
-//	// ... implement other methods
+//	// ... implement the other ShopStore methods
 //
 // # Thread Safety
 //

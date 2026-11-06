@@ -2,11 +2,16 @@ package store
 
 import (
 	"context"
-	"errors"
 	"time"
+
+	"github.com/shopware/sdk-go/sdkerrors"
 )
 
-var ErrShopNotFound = errors.New("shop not found")
+// ErrShopNotFound is returned (wrapped) by ShopStore implementations when the
+// shop does not exist. It is the same value as sdkerrors.ErrShopNotFound, so
+// errors.Is matches either name, whether the error comes from a store or from
+// the resolver.
+var ErrShopNotFound = sdkerrors.ErrShopNotFound
 
 // Shop represents a registered Shopware shop installation
 type Shop struct {

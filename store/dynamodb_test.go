@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/shopware/sdk-go/sdkerrors"
 	"github.com/shopware/sdk-go/store"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -232,7 +233,8 @@ func TestDynamoDBStore_GetShop_NotFound_ReturnsSentinelError(t *testing.T) {
 	_, err := dynStore.GetShopByID(context.Background(), "nonexistent")
 
 	require.Error(t, err)
-	assert.ErrorIs(t, err, store.ErrShopNotFound)
+	require.ErrorIs(t, err, store.ErrShopNotFound)
+	require.ErrorIs(t, err, sdkerrors.ErrShopNotFound)
 }
 
 func TestDynamoDBStore_GetShop_Success(t *testing.T) {
