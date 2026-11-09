@@ -1,5 +1,7 @@
 package response
 
+import "encoding/json"
+
 const (
 	// ActionTypeNotification represents a notification action type
 	ActionTypeNotification = "notification"
@@ -19,31 +21,69 @@ const (
 	// NotificationStatusInfo represents an info notification status
 	NotificationStatusInfo = "info"
 
-	// PaymentStatusPaid represents a paid payment status
-	PaymentStatusPaid = "paid"
-	// PaymentStatusOpen represents an open payment status
-	PaymentStatusOpen = "open"
-	// PaymentStatusFailed represents a failed payment status
-	PaymentStatusFailed = "failed"
-	// PaymentStatusCancelled represents a cancelled payment status
-	PaymentStatusCancelled = "cancelled"
-	// PaymentStatusAuthorized represents an authorized payment status
-	PaymentStatusAuthorized = "authorized"
+	// Payment statuses are the names of Shopware state machine transitions
+	// for the order transaction, not the names of the resulting states.
 
-	// RefundStatusSuccess represents a successful refund status
-	RefundStatusSuccess = "success"
-	// RefundStatusFailed represents a failed refund status
-	RefundStatusFailed = "failed"
-	// RefundStatusProcessing represents a processing refund status
-	RefundStatusProcessing = "processing"
+	// PaymentStatusPaid moves the payment to "paid".
+	PaymentStatusPaid = "paid"
+	// PaymentStatusOpen is not a Shopware transition.
+	//
+	// Deprecated: "open" is not a Shopware transition and is rejected by
+	// Shopware. Leave PaymentResponse.Status empty to keep the payment open.
+	PaymentStatusOpen = "open"
+	// PaymentStatusFailed moves the payment to "failed".
+	PaymentStatusFailed = "fail"
+	// PaymentStatusCancelled moves the payment to "cancelled"; Shopware treats
+	// it as a cancellation by the customer.
+	PaymentStatusCancelled = "cancel"
+	// PaymentStatusAuthorized moves the payment to "authorized".
+	PaymentStatusAuthorized = "authorize"
+
+	// Refund statuses are the names of Shopware state machine transitions
+	// for the refund, not the names of the resulting states.
+
+	// RefundStatusSuccess moves the refund to "completed".
+	RefundStatusSuccess = "complete"
+	// RefundStatusFailed moves the refund to "failed".
+	RefundStatusFailed = "fail"
+	// RefundStatusProcessing moves the refund to "in_progress".
+	RefundStatusProcessing = "process"
 )
 
-// ActionButtonResponse represents a response to an action button request
+// ActionButtonResponse represents a response to an action button request.
+//
+// Shopware reads everything except the action type from the "payload" object,
+// so the response is always encoded as {"actionType": ..., "payload": {...}}.
+// See MarshalJSON for how the fields are placed.
 type ActionButtonResponse struct {
-	ActionType string      `json:"actionType"`
-	Status     string      `json:"status,omitempty"`
-	Message    string      `json:"message,omitempty"`
-	Payload    interface{} `json:"payload,omitempty"`
+	ActionType string `json:"actionType"`
+	// Status is the notification status. It is encoded inside "payload".
+	Status string `json:"status,omitempty"`
+	// Message is the notification text. It is encoded inside "payload".
+	Message string `json:"message,omitempty"`
+	// Payload is the action payload. When set, it is encoded as is and
+	// Status and Message are ignored.
+	Payload any `json:"payload,omitempty"`
+}
+
+// MarshalJSON encodes the response in the format Shopware expects.
+//
+// The "payload" key is always present: Payload when set; otherwise an object
+// with Status and Message when either is set; otherwise an empty object.
+func (r ActionButtonResponse) MarshalJSON() ([]byte, error) {
+	payload := r.Payload
+	if payload == nil {
+		notification := struct {
+			Status  string `json:"status,omitempty"`
+			Message string `json:"message,omitempty"`
+		}{Status: r.Status, Message: r.Message}
+		payload = notification
+	}
+
+	return json.Marshal(struct {
+		ActionType string `json:"actionType"`
+		Payload    any    `json:"payload"`
+	}{ActionType: r.ActionType, Payload: payload})
 }
 
 // NotificationResponse creates a notification response
@@ -96,7 +136,7 @@ func OpenNewTabResponse(url string) ActionButtonResponse {
 func OpenModalResponse(url string) ActionButtonResponse {
 	return ActionButtonResponse{
 		ActionType: ActionTypeOpenModal,
-		Payload: map[string]interface{}{
+		Payload: map[string]any{
 			"iframeUrl": url,
 			"size":      "medium",
 			"expand":    false,
@@ -104,9 +144,13 @@ func OpenModalResponse(url string) ActionButtonResponse {
 	}
 }
 
-// PaymentResponse represents a response to a payment request
+// PaymentResponse represents a response to a payment request.
+//
+// Status is the name of a Shopware transition (see the PaymentStatus
+// constants). An empty Status requests no transition, so the payment stays
+// in its current state.
 type PaymentResponse struct {
-	Status      string `json:"status"`
+	Status      string `json:"status,omitempty"`
 	Message     string `json:"message,omitempty"`
 	RedirectURL string `json:"redirectUrl,omitempty"`
 }
@@ -118,11 +162,10 @@ func PaymentPaid() PaymentResponse {
 	}
 }
 
-// PaymentOpen creates a response indicating payment is still open
+// PaymentOpen creates a response that keeps the payment open. It sets no
+// status, because Shopware has no "open" transition.
 func PaymentOpen() PaymentResponse {
-	return PaymentResponse{
-		Status: PaymentStatusOpen,
-	}
+	return PaymentResponse{}
 }
 
 // PaymentFailed creates a response indicating payment failed
@@ -147,15 +190,19 @@ func PaymentAuthorized() PaymentResponse {
 	}
 }
 
-// PaymentRedirect creates a response that redirects the customer to an external payment page
+// PaymentRedirect creates a response that redirects the customer to an
+// external payment page. It sets no status, so the payment stays open until
+// the finalize request.
 func PaymentRedirect(url string) PaymentResponse {
 	return PaymentResponse{
-		Status:      PaymentStatusOpen,
 		RedirectURL: url,
 	}
 }
 
-// RefundResponse represents a response to a refund request
+// RefundResponse represents a response to a refund request.
+//
+// Status is the name of a Shopware transition (see the RefundStatus
+// constants).
 type RefundResponse struct {
 	Status  string `json:"status"`
 	Message string `json:"message,omitempty"`
