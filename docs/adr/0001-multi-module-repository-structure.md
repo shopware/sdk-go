@@ -132,6 +132,11 @@ Rules:
 example. Modules are tagged independently with the path prefix
 (`integrations/gin/vX.Y.Z`), as described in [RELEASING.md](../RELEASING.md).
 
+Releases are automated by `.github/workflows/release.yml`: versions are derived
+from `.changelog/*.json` fragments, only affected modules are tagged, in
+dependency order (`clients/adminapi`, core, integrations), and an umbrella GitHub
+Release is published. See [CHANGELOG_AND_RELEASES.md](../CHANGELOG_AND_RELEASES.md).
+
 ---
 
 ## Consequences

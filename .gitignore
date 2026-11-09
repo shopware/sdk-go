@@ -22,6 +22,10 @@ examples/vanilla-service/vanilla-service
 examples/gin-service/gin-service
 examples/admin-extension/admin-extension
 
+# changelog tool binary (built from tools/changelog/; use `go run` or `make changelog-*`)
+/changelog
+tools/changelog/changelog
+
 # Build artifacts
 /bin/
 /dist/
