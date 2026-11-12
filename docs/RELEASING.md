@@ -3,6 +3,14 @@
 This repository is a **multi-module Go workspace**. Each module is versioned and
 released independently. See [ADR 0001](adr/0001-multi-module-repository-structure.md).
 
+> **Releases are automated.** In normal operation you do not run the commands
+> below by hand — contributors add `.changelog/*.json` fragments and a maintainer
+> runs **Actions → Release → Run workflow**, which derives versions, generates
+> the notes, tags the modules and publishes the GitHub Release. See
+> [CHANGELOG_AND_RELEASES.md](CHANGELOG_AND_RELEASES.md). The sections below are
+> the reference for the conventions that automation follows (and the manual
+> fallback).
+
 ## Modules
 
 | Module                | Import path                                          | Tag prefix             |
@@ -73,7 +81,13 @@ CI builds against the local source through `go.work`, so the not-yet-existing
 versions are never downloaded. After the PR is merged, all modules are tagged on the
 **same merge commit**, in dependency order.
 
-Release checklist:
+The **Release** workflow automates steps 4–5: the PR adds changelog fragments for every
+module it pins ahead, and the workflow derives the same versions, checks them against
+the pinned `require`s (release-order guard) and tags in dependency order. See
+[CHANGELOG_AND_RELEASES.md](CHANGELOG_AND_RELEASES.md#release-order-guard). Step 6
+stays manual; the workflow reminds you when `go.work` still has a `replace`.
+
+Manual release checklist (fallback):
 
 1. Merge the PR and wait until CI on `main` is green. Never tag a red commit.
 2. Update your local `main`: `git checkout main && git pull origin main`.
@@ -156,7 +170,7 @@ Go module version — Go tooling ignores it; it exists only for release notes.
 
 The body lists every module released under a **Module Highlights** heading. Each
 entry names the module import path with its new version, followed by one bullet
-per change, labeled **Feature**, **Bug Fix**, **Documentation**, or **Release**:
+per change, labeled **Feature**, **Bug Fix**, **Documentation**, **Dependency**, or **Release**:
 
 ```markdown
 ## Module Highlights
@@ -170,13 +184,22 @@ per change, labeled **Feature**, **Bug Fix**, **Documentation**, or **Release**:
 
 ### Creating the release
 
-Point the umbrella tag at the same commit that carries the module tags:
+Normally the **Release** workflow does this (Actions → Release → Run workflow) —
+it generates the notes from the changelog fragments (into a temporary file that
+is not committed) and runs the command below for you. See
+[CHANGELOG_AND_RELEASES.md](CHANGELOG_AND_RELEASES.md).
+
+Manual fallback — generate the notes and point the umbrella tag at the same
+commit that carries the module tags:
 
 ```bash
+# Generate the notes body from the changelog fragments.
+make changelog-gen > notes.md   # or: cd tools && go run ./changelog gen
+
 gh release create release-2026-07-08 \
   --target main \
   --title "Release (2026-07-08)" \
-  --notes-file release-notes.md
+  --notes-file notes.md
 ```
 
 or via the GitHub UI: **Releases → Draft a new release**, type the umbrella tag
@@ -185,7 +208,8 @@ name (GitHub creates it on publish), set the title and paste the notes.
 ## CI
 
 `.github/workflows/ci.yml` runs lint, test, vulnerability scan, benchmarks and build per
-module via a matrix. Coverage gating runs for the core module and `clients/adminapi`.
+module via a matrix. Coverage gating runs for the core module and `clients/adminapi`. It also validates
+changelog fragments and requires one on user-visible PRs.
 
 ## Adding a new module
 
@@ -203,7 +227,9 @@ own PR, before the code that uses it:
      build);
    - `MODULES` in `.github/scripts/ci.sh` (also used by `compatibility.yml`);
    - the `vet` loop in the `Makefile`;
-   - the `go_modules` directories in `.github/dependabot.yml`.
+   - the `go_modules` directories in `.github/dependabot.yml`;
+   - the `Modules` registry in `tools/changelog/changelog.go`, after the modules it
+     depends on (see [CHANGELOG_AND_RELEASES.md](CHANGELOG_AND_RELEASES.md#adding-a-new-module-to-the-tooling)).
 4. Document it: the [Modules](#modules) table and [Tagging convention](#tagging-convention)
    above, the architecture tree in the [README](../README.md), and an ADR when the
    module changes the dependency direction.
