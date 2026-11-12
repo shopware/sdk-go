@@ -9,8 +9,8 @@ announce it in the release notes.
 
 ## Go Toolchain
 
-Build and run the SDK with an up-to-date Go patch release: **Go 1.26.10+** (or
-the latest 1.27.x, 1.27.3+). Standard-library advisories reported by `govulncheck ./...`
+Build and run the SDK with an up-to-date Go patch release: **Go 1.26.11+** (or
+the latest 1.27.x, 1.27.4+). Standard-library advisories reported by `govulncheck ./...`
 are toolchain issues — they are fixed by installing a patched Go release, never
 by upgrading a module dependency. CI pins the exact patch via `GO_VERSION` in
 `.github/workflows/ci.yml` and fails on any called vulnerability.

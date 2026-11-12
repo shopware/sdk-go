@@ -12,7 +12,7 @@ permissions:
 env:
   # We support the last 2 Go minors (1.26, 1.27); pin the oldest one here.
   # Always the latest secure patch of that minor.
-  GO_VERSION: '1.26.10'
+  GO_VERSION: '1.26.11'
   # Keep golangci-lint / govulncheck in sync with .devcontainer/Dockerfile.
   GOLANGCI_LINT_VERSION: 'v2.13.2'
   GOVULNCHECK_VERSION: 'v1.8.0'

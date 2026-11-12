@@ -60,6 +60,8 @@ A root `go.work` (Go workspaces) builds all modules and examples from local sour
 ```
 go 1.26.10
 
+toolchain go1.26.11
+
 use (
     .
     ./clients/adminapi

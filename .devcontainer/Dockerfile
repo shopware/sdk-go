@@ -4,7 +4,7 @@ ARG GO_IMAGE_VERSION=1.26-bookworm
 # the latest patch, so we install GO_VERSION explicitly over it to guarantee
 # standard-library security fixes (e.g. GO-2026-6218 / GO-2026-6179, fixed in 1.26.6;
 # GO-2026-6617, fixed in 1.26.9; GO-2026-6809, fixed in 1.26.10). Keep >= the recommended patch in README / go.mod compatibility floor.
-ARG GO_VERSION=1.26.10
+ARG GO_VERSION=1.26.11
 ARG GOLANGCI_LINT_VERSION=v2.13.2  # keep in sync with .github/workflows/ci.yml
 ARG DELVE_VERSION=v1.27.2
 ARG GOVULNCHECK_VERSION=v1.8.0
