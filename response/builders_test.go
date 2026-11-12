@@ -9,8 +9,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func marshal(t *testing.T, v any) string {
+	t.Helper()
+
+	data, err := json.Marshal(v)
+	require.NoError(t, err)
+
+	return string(data)
+}
+
 // TestNotificationResponse tests the base notification response function
 func TestNotificationResponse(t *testing.T) {
+	t.Parallel()
+
 	resp := response.NotificationResponse("success", "Operation completed")
 
 	assert.Equal(t, "notification", resp.ActionType)
@@ -19,84 +30,81 @@ func TestNotificationResponse(t *testing.T) {
 	assert.Nil(t, resp.Payload)
 }
 
-// TestNotificationSuccess tests success notification
-func TestNotificationSuccess(t *testing.T) {
-	resp := response.NotificationSuccess("Item created successfully")
+// TestNotifications_JSON checks that status and message are sent inside
+// "payload", where Shopware reads them.
+func TestNotifications_JSON(t *testing.T) {
+	t.Parallel()
 
-	assert.Equal(t, "notification", resp.ActionType)
-	assert.Equal(t, "success", resp.Status)
-	assert.Equal(t, "Item created successfully", resp.Message)
+	tests := []struct {
+		name     string
+		response response.ActionButtonResponse
+		want     string
+	}{
+		{
+			name:     "success",
+			response: response.NotificationSuccess("Item created successfully"),
+			want:     `{"actionType":"notification","payload":{"status":"success","message":"Item created successfully"}}`,
+		},
+		{
+			name:     "error",
+			response: response.NotificationError("Failed to process request"),
+			want:     `{"actionType":"notification","payload":{"status":"error","message":"Failed to process request"}}`,
+		},
+		{
+			name:     "warning",
+			response: response.NotificationWarning("This action cannot be undone"),
+			want:     `{"actionType":"notification","payload":{"status":"warning","message":"This action cannot be undone"}}`,
+		},
+		{
+			name:     "info",
+			response: response.NotificationInfo("Processing will continue in the background"),
+			want:     `{"actionType":"notification","payload":{"status":"info","message":"Processing will continue in the background"}}`,
+		},
+		{
+			name:     "empty message",
+			response: response.NotificationSuccess(""),
+			want:     `{"actionType":"notification","payload":{"status":"success"}}`,
+		},
+	}
 
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"actionType":"notification"`)
-	assert.Contains(t, string(jsonData), `"status":"success"`)
-	assert.Contains(t, string(jsonData), `"message":"Item created successfully"`)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assert.JSONEq(t, tt.want, marshal(t, tt.response))
+		})
+	}
 }
 
-// TestNotificationError tests error notification
-func TestNotificationError(t *testing.T) {
-	resp := response.NotificationError("Failed to process request")
+// TestNotificationBuilders checks the fields set by each notification builder.
+func TestNotificationBuilders(t *testing.T) {
+	t.Parallel()
 
-	assert.Equal(t, "notification", resp.ActionType)
-	assert.Equal(t, "error", resp.Status)
-	assert.Equal(t, "Failed to process request", resp.Message)
+	tests := []struct {
+		name       string
+		response   response.ActionButtonResponse
+		wantStatus string
+	}{
+		{name: "success", response: response.NotificationSuccess("m"), wantStatus: response.NotificationStatusSuccess},
+		{name: "error", response: response.NotificationError("m"), wantStatus: response.NotificationStatusError},
+		{name: "warning", response: response.NotificationWarning("m"), wantStatus: response.NotificationStatusWarning},
+		{name: "info", response: response.NotificationInfo("m"), wantStatus: response.NotificationStatusInfo},
+	}
 
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"actionType":"notification"`)
-	assert.Contains(t, string(jsonData), `"status":"error"`)
-	assert.Contains(t, string(jsonData), `"message":"Failed to process request"`)
-}
-
-// TestNotificationWarning tests warning notification
-func TestNotificationWarning(t *testing.T) {
-	resp := response.NotificationWarning("This action cannot be undone")
-
-	assert.Equal(t, "notification", resp.ActionType)
-	assert.Equal(t, "warning", resp.Status)
-	assert.Equal(t, "This action cannot be undone", resp.Message)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"actionType":"notification"`)
-	assert.Contains(t, string(jsonData), `"status":"warning"`)
-}
-
-// TestNotificationInfo tests info notification
-func TestNotificationInfo(t *testing.T) {
-	resp := response.NotificationInfo("Processing will continue in the background")
-
-	assert.Equal(t, "notification", resp.ActionType)
-	assert.Equal(t, "info", resp.Status)
-	assert.Equal(t, "Processing will continue in the background", resp.Message)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"actionType":"notification"`)
-	assert.Contains(t, string(jsonData), `"status":"info"`)
-}
-
-// TestNotification_EmptyMessage tests notifications with empty messages
-func TestNotification_EmptyMessage(t *testing.T) {
-	resp := response.NotificationSuccess("")
-
-	assert.Equal(t, "notification", resp.ActionType)
-	assert.Equal(t, "success", resp.Status)
-	assert.Empty(t, resp.Message)
-
-	// Should still marshal correctly
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"actionType":"notification"`)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, response.ActionTypeNotification, tt.response.ActionType)
+			assert.Equal(t, tt.wantStatus, tt.response.Status)
+			assert.Equal(t, "m", tt.response.Message)
+			assert.Nil(t, tt.response.Payload)
+		})
+	}
 }
 
 // TestReloadResponse tests reload action response
 func TestReloadResponse(t *testing.T) {
+	t.Parallel()
+
 	resp := response.ReloadResponse()
 
 	assert.Equal(t, "reload", resp.ActionType)
@@ -104,37 +112,31 @@ func TestReloadResponse(t *testing.T) {
 	assert.Empty(t, resp.Message)
 	assert.Nil(t, resp.Payload)
 
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"actionType":"reload"`)
-
-	// Status and message should be omitted (omitempty)
-	assert.NotContains(t, string(jsonData), `"status"`)
-	assert.NotContains(t, string(jsonData), `"message"`)
+	// Shopware rejects action button responses without a "payload" key.
+	assert.JSONEq(t, `{"actionType":"reload","payload":{}}`, marshal(t, resp))
 }
 
 // TestOpenNewTabResponse tests opening a new tab
 func TestOpenNewTabResponse(t *testing.T) {
+	t.Parallel()
+
 	resp := response.OpenNewTabResponse("https://example.com/external")
 
 	assert.Equal(t, "openNewTab", resp.ActionType)
-	assert.NotNil(t, resp.Payload)
 
-	// Verify payload structure
 	payload, ok := resp.Payload.(map[string]string)
 	require.True(t, ok, "Payload should be a map[string]string")
 	assert.Equal(t, "https://example.com/external", payload["redirectUrl"])
 
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"actionType":"openNewTab"`)
-	assert.Contains(t, string(jsonData), `"redirectUrl":"https://example.com/external"`)
+	assert.JSONEq(t,
+		`{"actionType":"openNewTab","payload":{"redirectUrl":"https://example.com/external"}}`,
+		marshal(t, resp))
 }
 
 // TestOpenNewTabResponse_EmptyURL tests opening a new tab with empty URL
 func TestOpenNewTabResponse_EmptyURL(t *testing.T) {
+	t.Parallel()
+
 	resp := response.OpenNewTabResponse("")
 
 	assert.Equal(t, "openNewTab", resp.ActionType)
@@ -145,361 +147,143 @@ func TestOpenNewTabResponse_EmptyURL(t *testing.T) {
 
 // TestOpenModalResponse tests opening a modal
 func TestOpenModalResponse(t *testing.T) {
+	t.Parallel()
+
 	resp := response.OpenModalResponse("https://example.com/modal-content")
 
 	assert.Equal(t, "openModal", resp.ActionType)
-	assert.NotNil(t, resp.Payload)
 
-	// Verify payload structure
-	payload, ok := resp.Payload.(map[string]interface{})
-	require.True(t, ok, "Payload should be a map[string]interface{}")
+	payload, ok := resp.Payload.(map[string]any)
+	require.True(t, ok, "Payload should be a map[string]any")
 	assert.Equal(t, "https://example.com/modal-content", payload["iframeUrl"])
 	assert.Equal(t, "medium", payload["size"])
 	assert.Equal(t, false, payload["expand"])
 
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"actionType":"openModal"`)
-	assert.Contains(t, string(jsonData), `"iframeUrl":"https://example.com/modal-content"`)
-	assert.Contains(t, string(jsonData), `"size":"medium"`)
-	assert.Contains(t, string(jsonData), `"expand":false`)
+	assert.JSONEq(t,
+		`{"actionType":"openModal","payload":{"iframeUrl":"https://example.com/modal-content","size":"medium","expand":false}}`,
+		marshal(t, resp))
 }
 
 // TestOpenModalResponse_EmptyURL tests opening a modal with empty URL
 func TestOpenModalResponse_EmptyURL(t *testing.T) {
+	t.Parallel()
+
 	resp := response.OpenModalResponse("")
 
-	payload, ok := resp.Payload.(map[string]interface{})
+	payload, ok := resp.Payload.(map[string]any)
 	require.True(t, ok)
 	assert.Empty(t, payload["iframeUrl"])
 }
 
-// TestPaymentPaid tests successful payment response
-func TestPaymentPaid(t *testing.T) {
-	resp := response.PaymentPaid()
-
-	assert.Equal(t, "paid", resp.Status)
-	assert.Empty(t, resp.Message)
-	assert.Empty(t, resp.RedirectURL)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"paid"`)
-	assert.NotContains(t, string(jsonData), `"message"`)
-	assert.NotContains(t, string(jsonData), `"redirectUrl"`)
-}
-
-// TestPaymentOpen tests open payment response
-func TestPaymentOpen(t *testing.T) {
-	resp := response.PaymentOpen()
-
-	assert.Equal(t, "open", resp.Status)
-	assert.Empty(t, resp.Message)
-	assert.Empty(t, resp.RedirectURL)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"open"`)
-}
-
-// TestPaymentFailed tests failed payment response
-func TestPaymentFailed(t *testing.T) {
-	resp := response.PaymentFailed("Insufficient funds")
-
-	assert.Equal(t, "failed", resp.Status)
-	assert.Equal(t, "Insufficient funds", resp.Message)
-	assert.Empty(t, resp.RedirectURL)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"failed"`)
-	assert.Contains(t, string(jsonData), `"message":"Insufficient funds"`)
-}
-
-// TestPaymentFailed_EmptyMessage tests failed payment with empty message
-func TestPaymentFailed_EmptyMessage(t *testing.T) {
-	resp := response.PaymentFailed("")
-
-	assert.Equal(t, "failed", resp.Status)
-	assert.Empty(t, resp.Message)
-}
-
-// TestPaymentCancelled tests cancelled payment response
-func TestPaymentCancelled(t *testing.T) {
-	resp := response.PaymentCancelled()
-
-	assert.Equal(t, "cancelled", resp.Status)
-	assert.Empty(t, resp.Message)
-	assert.Empty(t, resp.RedirectURL)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"cancelled"`)
-}
-
-// TestPaymentAuthorized tests authorized payment response
-func TestPaymentAuthorized(t *testing.T) {
-	resp := response.PaymentAuthorized()
-
-	assert.Equal(t, "authorized", resp.Status)
-	assert.Empty(t, resp.Message)
-	assert.Empty(t, resp.RedirectURL)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"authorized"`)
-}
-
-// TestPaymentRedirect tests payment redirect response
-func TestPaymentRedirect(t *testing.T) {
-	resp := response.PaymentRedirect("https://payment-gateway.com/checkout?id=12345")
-
-	assert.Equal(t, "open", resp.Status)
-	assert.Equal(t, "https://payment-gateway.com/checkout?id=12345", resp.RedirectURL)
-	assert.Empty(t, resp.Message)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"open"`)
-	assert.Contains(t, string(jsonData), `"redirectUrl":"https://payment-gateway.com/checkout?id=12345"`)
-}
-
-// TestPaymentRedirect_EmptyURL tests payment redirect with empty URL
-func TestPaymentRedirect_EmptyURL(t *testing.T) {
-	resp := response.PaymentRedirect("")
-
-	assert.Equal(t, "open", resp.Status)
-	assert.Empty(t, resp.RedirectURL)
-}
-
-// TestRefundSuccess tests successful refund response
-func TestRefundSuccess(t *testing.T) {
-	resp := response.RefundSuccess()
-
-	assert.Equal(t, "success", resp.Status)
-	assert.Empty(t, resp.Message)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"success"`)
-	assert.NotContains(t, string(jsonData), `"message"`)
-}
-
-// TestRefundFailed tests failed refund response
-func TestRefundFailed(t *testing.T) {
-	resp := response.RefundFailed("Original transaction cannot be refunded")
-
-	assert.Equal(t, "failed", resp.Status)
-	assert.Equal(t, "Original transaction cannot be refunded", resp.Message)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"failed"`)
-	assert.Contains(t, string(jsonData), `"message":"Original transaction cannot be refunded"`)
-}
-
-// TestRefundFailed_EmptyMessage tests failed refund with empty message
-func TestRefundFailed_EmptyMessage(t *testing.T) {
-	resp := response.RefundFailed("")
-
-	assert.Equal(t, "failed", resp.Status)
-	assert.Empty(t, resp.Message)
-}
-
-// TestRefundProcessing tests refund processing response
-func TestRefundProcessing(t *testing.T) {
-	resp := response.RefundProcessing()
-
-	assert.Equal(t, "processing", resp.Status)
-	assert.Empty(t, resp.Message)
-
-	// Verify JSON marshaling
-	jsonData, err := json.Marshal(resp)
-	require.NoError(t, err)
-	assert.Contains(t, string(jsonData), `"status":"processing"`)
-}
-
-// TestActionButtonResponse_JSONStructure tests the complete JSON structure
-func TestActionButtonResponse_JSONStructure(t *testing.T) {
+// TestActionButtonResponse_MarshalJSON covers responses built by hand.
+func TestActionButtonResponse_MarshalJSON(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		response response.ActionButtonResponse
-		expected map[string]interface{}
+		want     string
 	}{
 		{
-			name:     "notification with all fields",
-			response: response.NotificationError("Test error"),
-			expected: map[string]interface{}{
-				"actionType": "notification",
-				"status":     "error",
-				"message":    "Test error",
-			},
+			name:     "only action type",
+			response: response.ActionButtonResponse{ActionType: response.ActionTypeReload},
+			want:     `{"actionType":"reload","payload":{}}`,
 		},
 		{
-			name:     "reload without optional fields",
-			response: response.ReloadResponse(),
-			expected: map[string]interface{}{
-				"actionType": "reload",
+			name: "payload wins over status and message",
+			response: response.ActionButtonResponse{
+				ActionType: response.ActionTypeOpenNewTab,
+				Status:     "success",
+				Message:    "ignored",
+				Payload:    map[string]string{"redirectUrl": "https://example.com"},
 			},
+			want: `{"actionType":"openNewTab","payload":{"redirectUrl":"https://example.com"}}`,
 		},
 		{
-			name:     "openNewTab with payload",
-			response: response.OpenNewTabResponse("https://example.com"),
-			expected: map[string]interface{}{
-				"actionType": "openNewTab",
-				"payload": map[string]interface{}{
-					"redirectUrl": "https://example.com",
-				},
+			name: "status and message go into payload",
+			response: response.ActionButtonResponse{
+				ActionType: response.ActionTypeNotification,
+				Status:     "error",
+				Message:    "boom",
 			},
+			want: `{"actionType":"notification","payload":{"status":"error","message":"boom"}}`,
+		},
+		{
+			name:     "builder result",
+			response: response.NotificationInfo("hi"),
+			want:     `{"actionType":"notification","payload":{"status":"info","message":"hi"}}`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-
-			jsonData, err := json.Marshal(tt.response)
-			require.NoError(t, err)
-
-			var result map[string]interface{}
-			err = json.Unmarshal(jsonData, &result)
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.expected["actionType"], result["actionType"])
-
-			if tt.expected["status"] != nil {
-				assert.Equal(t, tt.expected["status"], result["status"])
-			}
-
-			if tt.expected["message"] != nil {
-				assert.Equal(t, tt.expected["message"], result["message"])
-			}
-
-			if tt.expected["payload"] != nil {
-				assert.NotNil(t, result["payload"])
-			}
+			assert.JSONEq(t, tt.want, marshal(t, tt.response))
+			assert.JSONEq(t, tt.want, marshal(t, &tt.response), "a pointer is encoded the same way")
 		})
 	}
 }
 
-// TestPaymentResponse_JSONStructure tests payment response JSON structure
-func TestPaymentResponse_JSONStructure(t *testing.T) {
+// TestPaymentResponses checks the status sent for each payment builder.
+// Shopware uses the status as a transition name; an empty status keeps the
+// payment open.
+func TestPaymentResponses(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name     string
 		response response.PaymentResponse
-		expected map[string]interface{}
+		want     string
 	}{
+		{name: "paid", response: response.PaymentPaid(), want: `{"status":"paid"}`},
+		{name: "open", response: response.PaymentOpen(), want: `{}`},
 		{
-			name:     "paid without optional fields",
-			response: response.PaymentPaid(),
-			expected: map[string]interface{}{
-				"status": "paid",
-			},
+			name:     "failed",
+			response: response.PaymentFailed("Insufficient funds"),
+			want:     `{"status":"fail","message":"Insufficient funds"}`,
 		},
+		{name: "failed without message", response: response.PaymentFailed(""), want: `{"status":"fail"}`},
+		{name: "cancelled", response: response.PaymentCancelled(), want: `{"status":"cancel"}`},
+		{name: "authorized", response: response.PaymentAuthorized(), want: `{"status":"authorize"}`},
 		{
-			name:     "failed with message",
-			response: response.PaymentFailed("Card declined"),
-			expected: map[string]interface{}{
-				"status":  "failed",
-				"message": "Card declined",
-			},
+			name:     "redirect",
+			response: response.PaymentRedirect("https://payment-gateway.com/checkout?id=12345"),
+			want:     `{"redirectUrl":"https://payment-gateway.com/checkout?id=12345"}`,
 		},
-		{
-			name:     "redirect with URL",
-			response: response.PaymentRedirect("https://payment.example.com"),
-			expected: map[string]interface{}{
-				"status":      "open",
-				"redirectUrl": "https://payment.example.com",
-			},
-		},
+		{name: "redirect without URL", response: response.PaymentRedirect(""), want: `{}`},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			jsonData, err := json.Marshal(tt.response)
-			require.NoError(t, err)
-
-			var result map[string]interface{}
-			err = json.Unmarshal(jsonData, &result)
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.expected["status"], result["status"])
-
-			if tt.expected["message"] != nil {
-				assert.Equal(t, tt.expected["message"], result["message"])
-			} else {
-				assert.Nil(t, result["message"])
-			}
-
-			if tt.expected["redirectUrl"] != nil {
-				assert.Equal(t, tt.expected["redirectUrl"], result["redirectUrl"])
-			} else {
-				assert.Nil(t, result["redirectUrl"])
-			}
+			t.Parallel()
+			assert.JSONEq(t, tt.want, marshal(t, tt.response))
 		})
 	}
 }
 
-// TestRefundResponse_JSONStructure tests refund response JSON structure
-func TestRefundResponse_JSONStructure(t *testing.T) {
+// TestRefundResponses checks the status sent for each refund builder.
+func TestRefundResponses(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name     string
 		response response.RefundResponse
-		expected map[string]interface{}
+		want     string
 	}{
+		{name: "success", response: response.RefundSuccess(), want: `{"status":"complete"}`},
 		{
-			name:     "success without message",
-			response: response.RefundSuccess(),
-			expected: map[string]interface{}{
-				"status": "success",
-			},
+			name:     "failed",
+			response: response.RefundFailed("Original transaction cannot be refunded"),
+			want:     `{"status":"fail","message":"Original transaction cannot be refunded"}`,
 		},
-		{
-			name:     "failed with message",
-			response: response.RefundFailed("Refund period expired"),
-			expected: map[string]interface{}{
-				"status":  "failed",
-				"message": "Refund period expired",
-			},
-		},
-		{
-			name:     "processing",
-			response: response.RefundProcessing(),
-			expected: map[string]interface{}{
-				"status": "processing",
-			},
-		},
+		{name: "failed without message", response: response.RefundFailed(""), want: `{"status":"fail"}`},
+		{name: "processing", response: response.RefundProcessing(), want: `{"status":"process"}`},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			jsonData, err := json.Marshal(tt.response)
-			require.NoError(t, err)
-
-			var result map[string]interface{}
-			err = json.Unmarshal(jsonData, &result)
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.expected["status"], result["status"])
-
-			if tt.expected["message"] != nil {
-				assert.Equal(t, tt.expected["message"], result["message"])
-			} else {
-				assert.Nil(t, result["message"])
-			}
+			assert.JSONEq(t, tt.want, marshal(t, tt.response))
 		})
 	}
 }

@@ -85,10 +85,21 @@ resp := response.OpenNewTabResponse("https://example.com")
 
 // Payment responses
 resp := response.PaymentPaid()
+resp := response.PaymentAuthorized()
 resp := response.PaymentFailed("Payment declined")
 resp := response.PaymentCancelled()
 resp := response.PaymentRedirect("https://payment-gateway.com/checkout")
+
+// Refund responses
+resp := response.RefundSuccess()
+resp := response.RefundFailed("Refund period expired")
 ```
+
+Action button responses are always sent as `{"actionType": ..., "payload": {...}}`;
+a notification's `status` and `message` go inside `payload`. The `status` of a payment
+or refund response is a Shopware transition name (`paid`, `authorize`, `fail`,
+`cancel`, `complete`, `process`). Responses without a status (`PaymentOpen`,
+`PaymentRedirect`) leave the payment open.
 
 ## Storage Backends
 
