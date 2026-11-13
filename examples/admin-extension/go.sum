@@ -104,8 +104,8 @@ github.com/quic-go/quic-go v0.63.0 h1:LIFGHI4PFUhhw2dDD1ARHdCff143ffMHwZtbnbuJ78
 github.com/quic-go/quic-go v0.63.0/go.mod h1:RAro2j2yN9a9EiPACLHT9IB2NXCvGQmmo/alT0yYI0w=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec h1:W09IVJc94icq4NjY3clb7Lk8O1qJ8BdBEF8z0ibU0rE=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
-github.com/shopware/sdk-go v1.0.0 h1:SNXBEO2Q+MZfLc/eMt0EOt3qUBxNdv3W4Rxv0gUMv2Q=
-github.com/shopware/sdk-go v1.0.0/go.mod h1:Bt2mAvfM0EMeQGi+zhpQXHAPtURSWm+96+mUTsN5Hpg=
+github.com/shopware/sdk-go v1.0.1 h1:ytP2wB+O6FzPaaW5SY/vJGBd+wcqs3Po7AfY1rpo/8w=
+github.com/shopware/sdk-go v1.0.1/go.mod h1:+0lcqJxjuyFocKHnm48epwlh9HziG2UaQ5+BYU42U58=
 github.com/shopware/sdk-go/clients/adminapi v1.0.0 h1:etZPzv5baN34ueUpD+E5gj1zk5uc1DoNQGGPxk4rYog=
 github.com/shopware/sdk-go/clients/adminapi v1.0.0/go.mod h1:F+LfqFib3R9naqu3nuaBCBJboJsIOeh/PWna9UDUAr0=
 github.com/shopware/sdk-go/integrations/gin v1.0.0 h1:TJRnrmMor7o0Dl82Z3KxGrOqUfIJHKUNTjN5BwoWJIE=

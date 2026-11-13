@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/gin-gonic/gin v1.12.0
-	github.com/shopware/sdk-go v1.0.0
+	github.com/shopware/sdk-go v1.0.1
 	github.com/shopware/sdk-go/clients/adminapi v1.0.0
 	github.com/stretchr/testify v1.12.1
 )
