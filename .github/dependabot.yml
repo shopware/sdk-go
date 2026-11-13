@@ -16,11 +16,45 @@ updates:
         patterns:
           - "*"
 
+  # Published modules. Their `go` directive is the minimum Go version forced on
+  # every consumer (we support Go 1.26.0+), so it must not move. Dependabot has
+  # no option to keep it: `go`/`toolchain` are not dependencies, but Go raises
+  # the directive when a bumped dependency declares a newer `go`. The
+  # "Go directive unchanged" job in .github/workflows/ci.yml fails such PRs.
+  # When a dependency needs a newer Go, ignore those versions here, e.g.:
+  #
+  #   ignore:
+  #     - dependency-name: "golang.org/x/net"
+  #       versions: [">= 0.63.0"]
+  #
+  # or apply the "go-version-bump" label for an intentional raise.
   - package-ecosystem: "gomod"
     directories:
       - "/"                       # core module
       - "/integrations/gin"       # gin integration module
       - "/clients/adminapi"       # Admin API client module
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    commit-message:
+      prefix: "chore(deps): "
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+    groups:
+      library-minor:
+        update-types:
+          - "minor"
+      library-patch:
+        update-types:
+          - "patch"
+
+  # Examples are not published, so their `go` directive may follow their
+  # dependencies. Kept separate so example-only bumps never share a PR with
+  # library bumps.
+  - package-ecosystem: "gomod"
+    directories:
       - "/examples/admin-extension"
       - "/examples/gin-service"
       - "/examples/vanilla-service"
@@ -34,9 +68,9 @@ updates:
       - "dependencies"
       - "go"
     groups:
-      minor-dependencies:
+      examples-minor:
         update-types:
           - "minor"
-      patch-dependencies:
+      examples-patch:
         update-types:
           - "patch"
