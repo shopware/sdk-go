@@ -67,6 +67,9 @@ help once it has been pushed to a public repository.
 - Keep unrelated refactors out of feature or bugfix PRs.
 - Explain any public API change in the PR description.
 - For user-visible changes, update README or `/docs`.
+- Add a changelog fragment for `feat`/`fix`/`docs`/`perf` PRs: `make changelog-new`.
+  See [docs/CHANGELOG_AND_RELEASES.md](docs/CHANGELOG_AND_RELEASES.md). CI enforces
+  this (bypass with the `skip-changelog` label).
 
 ## Roadmap And Decisions
 

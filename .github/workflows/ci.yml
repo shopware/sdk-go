@@ -334,3 +334,66 @@ jobs:
       - name: Build
         working-directory: ${{ matrix.module }}
         run: go build -v ${{ matrix.pkgs }}
+
+  # Validate every changelog fragment is well-formed (see
+  # docs/CHANGELOG_AND_RELEASES.md and the tools/changelog generator).
+  changelog-validate:
+    name: Validate changelog fragments
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Validate fragments
+        run: go run ./tools/changelog validate
+
+      - name: Test changelog tool
+        run: go test ./tools/...
+
+  # Require a changelog fragment for user-visible PRs (feat/fix/docs/perf).
+  # Bypass with the "skip-changelog" label.
+  changelog-required:
+    name: Changelog entry required
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Check for a changelog fragment
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+
+          # Conventional-commit type is the token before the first ':' or '('.
+          TYPE="${TITLE%%[:(]*}"
+          TYPE="${TYPE//[[:space:]]/}"
+          TYPE="${TYPE%!}"   # drop a breaking-change marker, e.g. "feat!" -> "feat"
+          case "${TYPE}" in
+            feat|fix|docs|perf) ;;
+            *) echo "PR type '${TYPE}' does not require a changelog entry."; exit 0 ;;
+          esac
+
+          if echo "${LABELS}" | grep -q '"skip-changelog"'; then
+            echo "skip-changelog label present — not required."
+            exit 0
+          fi
+
+          git fetch --no-tags origin "${BASE}"
+          ADDED=$(git diff --name-only --diff-filter=A "origin/${BASE}...HEAD" -- .changelog/ | grep -c '\.json$' || true)
+          if [[ "${ADDED}" -lt 1 ]]; then
+            echo "::error::This '${TYPE}' PR must add a .changelog/*.json entry (run 'cd tools && go run ./changelog new'), or apply the 'skip-changelog' label. See docs/CHANGELOG_AND_RELEASES.md."
+            exit 1
+          fi
+          echo "Found ${ADDED} changelog fragment(s)."

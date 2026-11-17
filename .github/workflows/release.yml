@@ -1,0 +1,158 @@
+name: Release
+
+# Manual release. Versions are NOT entered here — they are derived from the
+# .changelog/*.json fragments merged since the previous release. See
+# docs/CHANGELOG_AND_RELEASES.md.
+#
+# Run: Actions -> Release -> Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      general_highlights:
+        description: 'Optional markdown for the "General Highlights" section (repo-wide notes). Leave blank to omit.'
+        required: false
+        type: string
+      dry_run:
+        description: 'Print the plan and notes without creating tags or the release.'
+        required: false
+        type: boolean
+        default: false
+
+# contents: write is required to push module tags and create the GitHub Release.
+# No commit is ever pushed to a branch — only tags and the release are created.
+permissions:
+  contents: write
+
+env:
+  GO_VERSION: '1.26.10'
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # full history + all tags for diff/version computation
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Determine previous release tag
+        id: prev
+        run: |
+          set -euo pipefail
+          PREV=$(git for-each-ref --sort=-creatordate --format='%(refname:short)' 'refs/tags/release-*' | head -n1 || true)
+          echo "prev=${PREV}" >> "${GITHUB_OUTPUT}"
+          echo "Previous release tag: ${PREV:-<none>}"
+
+      - name: Compute release plan
+        id: plan
+        env:
+          PREV: ${{ steps.prev.outputs.prev }}
+        run: |
+          set -euo pipefail
+          SINCE=()
+          if [[ -n "${PREV}" ]]; then SINCE=(--since "${PREV}"); fi
+
+          # `plan` fails if there is nothing to release, a major bump is
+          # requested, or the dependency guard is violated.
+          go run ./tools/changelog plan "${SINCE[@]}"
+          go run ./tools/changelog plan --format json "${SINCE[@]}" > plan.json
+          echo "Release plan:"; cat plan.json
+
+      - name: Generate release notes
+        env:
+          PREV: ${{ steps.prev.outputs.prev }}
+          GENERAL_INPUT: ${{ inputs.general_highlights }}
+        run: |
+          set -euo pipefail
+          SINCE=()
+          if [[ -n "${PREV}" ]]; then SINCE=(--since "${PREV}"); fi
+
+          GENERAL=()
+          if [[ -n "${GENERAL_INPUT}" ]]; then
+            printf '%s\n' "${GENERAL_INPUT}" > general.md
+            GENERAL=(--general general.md)
+          fi
+
+          go run ./tools/changelog gen "${SINCE[@]}" "${GENERAL[@]}" > body.md
+          echo "----- release notes -----"; cat body.md
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          echo "DRY RUN — no tags or release will be created."
+          echo "Module tags that would be created:"
+          jq -r '.[] | "  " + .tag' plan.json
+
+      - name: Create and push module tags
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # The tool emits modules in dependency order (clients/adminapi, core,
+          # integrations), so each dependency is tagged before its dependents.
+          # Annotated tags, messages as in docs/RELEASING.md ("sdk-go v1.1.0",
+          # "clients/adminapi v1.0.0").
+          while IFS=$'\t' read -r tag msg; do
+            echo "Tagging ${tag} at ${GITHUB_SHA}"
+            git tag -a "${tag}" -m "${msg}" "${GITHUB_SHA}"
+            git push origin "${tag}"
+          done < <(jq -r '.[] | [.tag, ((if .dir == "." then "sdk-go" else .dir end) + " " + .next)] | @tsv' plan.json)
+
+      - name: Create umbrella GitHub Release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +%F)
+          NAME="${DATE}"
+          if git rev-parse -q --verify "refs/tags/release-${DATE}" >/dev/null; then
+            n=2
+            while git rev-parse -q --verify "refs/tags/release-${DATE}.${n}" >/dev/null; do
+              n=$((n + 1))
+            done
+            NAME="${DATE}.${n}"
+          fi
+          UMBRELLA="release-${NAME}"
+          echo "Creating ${UMBRELLA}"
+          gh release create "${UMBRELLA}" \
+            --target "${GITHUB_SHA}" \
+            --title "Release (${NAME})" \
+            --notes-file body.md
+
+      - name: Warm proxy.golang.org (best effort)
+        if: ${{ !inputs.dry_run }}
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          # Fetching each new version through the proxy makes it available to
+          # `go get` right away and lets pkg.go.dev pick it up. Run outside the
+          # repository: in workspace mode Go resolves the modules to local source.
+          while read -r line; do
+            mod=$(echo "${line}" | jq -r '.importPath')
+            ver=$(echo "${line}" | jq -r '.next')
+            echo "warming ${mod}@${ver}"
+            (cd "${RUNNER_TEMP}" && GOWORK=off GOPROXY=https://proxy.golang.org go list -m "${mod}@${ver}") || true
+          done < <(jq -c '.[]' plan.json)
+
+      # Pin ahead adds temporary go.work replaces for versions that were not
+      # tagged yet (docs/RELEASING.md). They exist now, so the replaces must go.
+      # The workflow never pushes commits, so this only reminds the maintainer.
+      - name: Remind about temporary go.work replaces
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          if grep -q '^[[:space:]]*replace' go.work; then
+            echo "::notice file=go.work::go.work still has replace directives. Remove the temporary replaces for the versions released now in a follow-up PR (docs/RELEASING.md, pin ahead)."
+            grep -n 'replace' go.work
+          fi

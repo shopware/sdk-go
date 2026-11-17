@@ -9,4 +9,5 @@ use (
 	./examples/gin-service
 	./examples/vanilla-service
 	./integrations/gin
+	./tools
 )
