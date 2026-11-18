@@ -8,7 +8,7 @@ require (
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/shopware/sdk-go v1.0.1
 	github.com/shopware/sdk-go/clients/adminapi v1.0.0
-	github.com/shopware/sdk-go/integrations/gin v1.0.0
+	github.com/shopware/sdk-go/integrations/gin v1.0.1
 	github.com/stretchr/testify v1.12.1
 )
 
