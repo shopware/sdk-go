@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.12.0
 	github.com/shopware/sdk-go v1.0.1
 	github.com/shopware/sdk-go/clients/adminapi v1.0.0
-	github.com/shopware/sdk-go/integrations/gin v1.0.0
+	github.com/shopware/sdk-go/integrations/gin v1.0.1
 )
 
 require (
